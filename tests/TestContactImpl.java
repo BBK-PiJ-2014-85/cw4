@@ -146,7 +146,7 @@ public class TestContactImpl {
 	{
 		Contact ct = new ContactImpl(65,"Bob","");
 		ct.addNotes("This should be the first line.");
-		assertEquals("This should eb the first line.", ct.getNotes());
+		assertEquals("This should be the first line.", ct.getNotes());
 	}
 	
 	@Test
@@ -154,7 +154,7 @@ public class TestContactImpl {
 	{
 		Contact ct = new ContactImpl(65,"Bob",null);
 		ct.addNotes("This should be the first line.");
-		assertEquals("This should eb the first line.", ct.getNotes());
+		assertEquals("This should be the first line.", ct.getNotes());
 	}
 	
 	@Test
@@ -171,7 +171,7 @@ public class TestContactImpl {
 	{
 		Contact ct = new ContactImpl(65,"Bob","Line 1.");
 		ct.addNotes("Line 2.");
-		assertEquals("Line1. Line2.", ct.getNotes());
+		assertEquals("Line 1. Line 2.", ct.getNotes());
 	}
 	
 
