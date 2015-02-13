@@ -17,29 +17,11 @@ import org.junit.Test;
 public class TestContactImpl {
 
 	/*
-	 * 
-	 * Thoughts on class:
-	 * 	- ID will be set by constructor, managed by the contact manger. Would rather use contact manger rather than a static within contact to allow multiple contact managers being run at once
-	 * 	- Name will be set by constructor, as provided by the user
-	 * 	- Note looks necessary in contactManager method as well, as the only way of adding a contact requires a non empty input for notes. 
-	 * 
-	 * This class then ends up pretty simple. Only need to test the add and remove for ID and Name, and adding notes, not adding notes, and adding multiple notes.
-	 * 
-	 * methods to test
-	 * 
-	 * getId
-	 * 	- assume set 
-	 * 
-	 * 
-	 * getName
-	 * 
 	 * getNotes
 	 * 	- TODO does adding notes to already existing notes append, overwrite, or be impossible?
 	 * 		- Current assumption is that it appends so you can add multiple notes about a contact
 	 *  - TODO should nulls be allowed in contact?
-	 *  
-	 * 
-	 * addNotes
+
 	 * 
 	 * What to do with nulls?
 	 * 	- The interface does not state that the class will throw null pointer exceptions, whereas the class contact manager
