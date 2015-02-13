@@ -36,15 +36,13 @@ PastMeeting getPastMeeting(int id);
 there is none.
 *
 * @param id the ID for the meeting
-* @return the meeting with the requested ID, or null if it ther
-e is none.
+* @return the meeting with the requested ID, or null if it there is none.
 * @throws IllegalArgumentException if there is a meeting with that ID happening in the past
 */
 FutureMeeting getFutureMeeting(int id);
 
 /**
-* Returns the meeting with the requested ID, or null if it ther
-e is none.
+* Returns the meeting with the requested ID, or null if it there is none.
 *
 * @param id the ID for the meeting
 * @return the meeting with the requested ID, or null if it there is none.
@@ -66,14 +64,11 @@ exist
 List<Meeting> getFutureMeetingList(Contact contact);
 
 /**
-* Returns the list of meetings that are scheduled for, or that
-took
+* Returns the list of meetings that are scheduled for, or thattook
 * place on, the specified date
 *
-* If there are none, the returned list will be empty. Otherwis
-e,
-* the list will be chronologically sorted and will not contai
-n any
+* If there are none, the returned list will be empty. Otherwise,
+* the list will be chronologically sorted and will not contain any
 * duplicates.
 *
 * @param date the date
@@ -90,8 +85,7 @@ List<Meeting> getFutureMeetingList(Calendar date);
 *
 * @param contact one of the user’s contacts
 * @return the list of future meeting(s) scheduled with this contact (maybe empty).
-* @throws IllegalArgumentException if the contact does not
-exist
+* @throws IllegalArgumentException if the contact does not exist
 */
 List<PastMeeting> getPastMeetingList(Contact contact);
 
@@ -101,8 +95,7 @@ List<PastMeeting> getPastMeetingList(Contact contact);
 * @param contacts a list of participants
 * @param date the date on which the meeting took place
 * @param text messages to be added about the meeting.
-* @throws IllegalArgumentException if the list of contacts
-is
+* @throws IllegalArgumentException if the list of contacts is
 * empty, or any of the contacts does not exist
 * @throws NullPointerException if any of the arguments is null
 */
@@ -143,13 +136,11 @@ void addNewContact(String name, String notes);
 Set<Contact> getContacts(int... ids);
 
 /**
-* Returns a list with the contacts whose name contains that st
-ring.
+* Returns a list with the contacts whose name contains that string.
 
 *
 * @param name the string to search for
-* @return a list with the contacts whose name contains that st
-ring.
+* @return a list with the contacts whose name contains that string.
 * @throws NullPointerException if the parameter is null
 */
 Set<Contact> getContacts(String name);
