@@ -7,8 +7,10 @@ import interfaces.Contact;
  * 
  * Several assumptions have been made in the creation of this class:
  * 	- Adding notes when notes already exist will, if the current notes and new string is nonempty, append these
+ * 		with a space in the middle. Adding empty spaces will be appended in the same way.
  * 	- nulls are allowed to be entered for name and notes. It has not been specified to throw any exceptions, and the
  * 		class contact manager deals with nulls and empty strings.
+ * 	- Empty names and notes can be stored.
  * 
  * @author Paul Day
  *
