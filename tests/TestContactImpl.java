@@ -158,6 +158,15 @@ public class TestContactImpl {
 	}
 	
 	@Test
+	public void testAddNullNotes()
+	{
+		Contact ct = new ContactImpl(65,"Bob","Notes.");
+		String input = null;
+		ct.addNotes(input);
+		assertEquals("Notes.", ct.getNotes());
+	}
+	
+	@Test
 	public void testAddNotesToNonEmpty()
 	{
 		Contact ct = new ContactImpl(65,"Bob","Line 1.");
