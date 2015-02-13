@@ -16,32 +16,34 @@ import interfaces.Contact;
 
 public class ContactImpl implements Contact {
 	
-	public ContactImpl(int iD, String name, String notes)
+	String name;
+	String notes;
+	int id;
+	
+	public ContactImpl(int id, String name, String notes)
 	{
-		
+		this.id = id;
+		this.name = name;
+		this.notes = notes;
 	}
 	
 	@Override
-	public int getId() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+	public int getId() { return id; }
 
 	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public String getName() { return name;}
 
 	@Override
-	public String getNotes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public String getNotes() { return notes;}
 
 	@Override
 	public void addNotes(String note) {
-		// TODO Auto-generated method stub
+		if (note != null)
+		{
+			if (notes == null) notes = note;
+			else if (notes.length() > 0) notes = notes + " " + note;
+			else notes = note;
+		}
 
 	}
 
