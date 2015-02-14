@@ -19,7 +19,11 @@ public class TestContactManagerImpl {
 	 * file exists
 	 * file is in right format
 	 * 
+	 * id for meetings assigned correctly
+	 * can't have meeting with no contacts
+	 * can't create a meeting with no date
 	 * 
+	 * does the set compare properly for contacts to keep unique?
 	 * 
 	 */
 	
