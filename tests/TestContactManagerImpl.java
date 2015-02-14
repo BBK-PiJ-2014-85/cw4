@@ -15,6 +15,9 @@ public class TestContactManagerImpl {
 	 * TODO: What if the meeting is set on the same day, do we signify time as well?
 	 * TODO: getContactsInt, what if no input?
 	 * TODO: should getContacts(String) match be case sensitive?
+	 * TODO: Should meetings be autoupdated when they become past?
+	 * TODO: how do we do something on program close?
+	 * TODO: 
 	 * 
 	 * Things to test:
 	 * 
