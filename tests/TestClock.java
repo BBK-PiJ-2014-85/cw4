@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 
 import impls.Clock;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -20,7 +21,15 @@ public class TestClock {
 
 	// TODO - set up method to round off rather than repeat.
 
-	@Test public void testStartsOffAsSystemTime() 
+	@Before
+	public void resetClock()
+	{
+		Clock.resetToSystemTime();
+	}
+	
+	
+	@Test 
+	public void testStartsOffAsSystemTime() 
 	{
 		Calendar current = Clock.getCurrent();
 		Calendar system = new GregorianCalendar();
@@ -46,7 +55,8 @@ public class TestClock {
 		assertEquals(system.get(Calendar.SECOND),current.get(Calendar.SECOND));
 	}
 	
-	@Test public void testOverwritesCorrectly() 
+	@Test 
+	public void testOverwritesCorrectly() 
 	{
 		Clock.setTime(new GregorianCalendar(2010,5,5));
 		
@@ -55,7 +65,8 @@ public class TestClock {
 		assertEquals(5,Clock.getCurrent().get(Calendar.DAY_OF_MONTH));
 	}
 	
-	@Test public void testResetsCorrectly() 
+	@Test 
+	public void testResetsCorrectly() 
 	{
 		Clock.setTime(new GregorianCalendar(2010,5,5));
 		Clock.resetToSystemTime();
@@ -80,7 +91,8 @@ public class TestClock {
 		assertEquals(system.get(Calendar.SECOND),current.get(Calendar.SECOND));
 	}
 	
-	@Test public void testOverwritingCurrentlyOverwritten() 
+	@Test 
+	public void testOverwritingCurrentlyOverwritten() 
 	{
 		Clock.setTime(new GregorianCalendar(2020,3,3));
 		Clock.setTime(new GregorianCalendar(2010,5,5));
