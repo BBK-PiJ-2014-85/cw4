@@ -1,5 +1,29 @@
 package tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import impls.ContactImpl;
+import impls.ContactManagerImpl;
+import impls.FutureMeetingImpl;
+import impls.MeetingImpl;
+import impls.PastMeetingImpl;
+import interfaces.Contact;
+import interfaces.ContactManager;
+import interfaces.Meeting;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -11,13 +35,66 @@ import org.junit.Test;
 
 public class TestContactManagerImpl {
 
+	Calendar currentDate;
+	
+	Calendar futureDateMonth;
+	Calendar futureDateYear;
+	Calendar futureDateMinute;
+	Calendar pastDateMonth;
+	Calendar pastDateYear;
+	Calendar pastDateMinute;
+
+	
+	final File contactFile = new File("Contact.txt");
+	
+	/* 
+	 * testContactsFile.txt contains no meetings and two contacts:
+	 * 	1) id=1 name="Bob" notes="Nice guy"
+	 * 	2) id=2 name="Fred" notes="Talks too much"
+	 */
+	final File testContactsFile = new File("tests/testContactsFile.txt");
+	
+	/*
+	 * testMeetingsFile.txt contains two contacts and two meetings:
+	 * Contacts:
+	 * 	1) id=1 name="Bob" notes="Nice guy"
+	 * 	2) id=2 name="Fred" notes="Talks too much"
+	 * 	3) id=3 name="Anon" notes=""
+	 * 
+	 * 4 Meetings:
+	 * 	1) 
+	 */
+	final File testMeetingsFile = new File("tests/testMeetingsFile.txt");
+	final File testConAndMeetFile = new File("tests/testConAndMeetFile.txt");
+	
+	//final Path contactPath = contactFile.toPath();
+	//final Path testContactsPath = testContactsFile.toPath();
+	//final Path testMeetingsPath = testMeetingsFile.toPath();
+	//final Path testConAndMeetPath = testConAndMeetFile.toPath();
+	
+	Contact c1, c2, c3;
+	
+	Meeting m1, m2, m3, m4;
+	
+	
+	ContactManager cm;
+	
 	/*
 	 * TODO: What if the meeting is set on the same day, do we signify time as well?
 	 * TODO: getContactsInt, what if no input?
 	 * TODO: should getContacts(String) match be case sensitive?
 	 * TODO: Should meetings be autoupdated when they become past?
-	 * TODO: how do we do something on program close?
-	 * TODO: 
+	 * TODO: how do we do something on program close? Will need to test this in several places, for now, just have a flush
+	 * 			after every method that can run?
+	 * TODO: Can we assume that multiple cannot be run at the same time?
+	 * 
+	 * TODO: ME: Test things dont get removed when getting
+	 * TODO: ME: Add an equals method to contact to make comparing easy 
+	 * TODO: Test meeting swiched to past meeting where expected
+	 * TODO: Can test things ticking over from future to past by checking system time after, failing the test should it not be able to be completed in time (after trying several times)
+	 * TODO: Measure chronologically within seconds
+	 * TODO: TEst updated with each method that can be run and change
+	 * TODO: Test files after all excpetions
 	 * 
 	 * Things to test:
 	 * 
@@ -27,27 +104,150 @@ public class TestContactManagerImpl {
 	
 	//Test reading and writing file
 	
-	@Test public void testFileCreatedIfNotExist() {}
+	public void copyFile(File from, File to)
+	{
+		Path pFrom = from.toPath();
+		Path pTo = to.toPath();
+		try {
+			Files.copy(pFrom, pTo, StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			fail("IOException found");
+		}
+	}
 	
-	@Test public void testFileContactsReadCorrectly() {}
+	public Contact getOnlyContactFromSet(Set<Contact> set)
+	{
+		if (set.size() == 0) fail("Set didn't return any contacts");
+		else if (set.size() > 1) fail("Set returned more than one contact");
+		else for(Contact con : set) return con;
+		
+		return null;
+	}
 	
-	@Test public void testFileContactsReadCorrectlyEmpty() {}
+	public void setUpDates()
+	{
+		currentDate = new GregorianCalendar();
+		(futureDateYear= new GregorianCalendar()).add(Calendar.YEAR,1);
+		(futureDateMonth= new GregorianCalendar()).add(Calendar.MONTH,1);
+		(futureDateMinute= new GregorianCalendar()).add(Calendar.MINUTE,1);	
+		(pastDateYear= new GregorianCalendar()).add(Calendar.YEAR,-1);
+		(pastDateMonth= new GregorianCalendar()).add(Calendar.MONTH,-1);
+		(pastDateMinute= new GregorianCalendar()).add(Calendar.MINUTE,-1);
+	}
 	
-	@Test public void testFileMeetingsReadCorrectly() {}
 	
-	@Test public void testFileMeetingsReadCorrectlyEmpty() {}
+	@Before 
+	public void cleanStart()
+	{
+		setUpDates();
+		
+		if (contactFile.exists()) contactFile.delete(); 
+		cm = new ContactManagerImpl();
+		
+		c1 = new ContactImpl(1,"Bob","Nice guy");
+		c2 = new ContactImpl(2,"Fred","Talks too much");
+		c3 = new ContactImpl(3, "Anon", "");
+		
+		m1 = new MeetingImpl(1,null,null); //TODO: Add proper meetings in here
+		m2 = new PastMeetingImpl(); //TODO: Add proper meetings in here
+		m3 = new PastMeetingImpl(); //TODO: Add proper meeting, without notes yet, in here
+		m4 = new FutureMeetingImpl(); //TODO: Add proper meetings in here
+	}
 	
-	@Test public void testFileReadNextContactIDCorrect() {}
+	// Test reading and altering file correctly
 	
-	@Test public void testFileReadNextMeetingIDCorrect() {}
+	@Test 
+	public void testFileCreatedIfNotExist() 
+	{
+		assertTrue(contactFile.exists());
+	}
 	
-	@Test public void testFileSavedCorrectly() {}
+	@Test 
+	public void testFileContactsReadCorrectly() 
+	{
+		copyFile(testContactsFile,contactFile);
+		
+		cm = new ContactManagerImpl();
+		
+		assertEquals(c1,getOnlyContactFromSet(cm.getContacts(1)));
+		assertEquals(c2,getOnlyContactFromSet(cm.getContacts(2)));
+		assertEquals(c3,getOnlyContactFromSet(cm.getContacts(3)));
+		
+	}
 	
-	@Test public void testFileSavedCorrectlyFileCurrentlyExists() {}
+	@Test 
+	public void testFileContactsReadCorrectlyWithMeetings() 
+	{
+		copyFile(testMeetingsFile,contactFile);
+		
+		cm = new ContactManagerImpl();
+		
+		assertEquals(c1,getOnlyContactFromSet(cm.getContacts(1)));
+		assertEquals(c2,getOnlyContactFromSet(cm.getContacts(2)));
+		assertEquals(c3,getOnlyContactFromSet(cm.getContacts(3)));
+		
+	}
 	
-	@Test public void testFileSavedCorrectlyContactsEmpty() {}
+	@Test 
+	public void testFileMeetingsReadCorrectly() 
+	{
+		copyFile(testMeetingsFile,contactFile);
+		
+		cm = new ContactManagerImpl();
+		
+		assertEquals(m1,cm.getMeeting(1));
+		assertEquals(m2,cm.getMeeting(2));
+		assertEquals(m3,cm.getMeeting(3));
+		assertEquals(m4,cm.getMeeting(4));
+	}
 	
-	@Test public void testFileSavedCorrectlyMeetingsEmpty() {}
+	@Test 
+	public void testFileReadNextContactIDCorrect() 
+	{
+		copyFile(testMeetingsFile,contactFile);
+		
+		cm = new ContactManagerImpl();
+		
+		cm.addNewContact("Extra Added", "Next contact");
+		assertEquals(4,getOnlyContactFromSet(cm.getContacts("Extra Added")).getId());
+	}
+	
+	@Test 
+	public void testFileReadNextMeetingIDCorrect() 
+	{
+		copyFile(testMeetingsFile,contactFile);
+		
+		cm = new ContactManagerImpl();
+		
+		Set<Contact> contacts = new HashSet<Contact>();
+		contacts.add(c1);
+		contacts.add(c2);
+		
+		cm.addFutureMeeting(contacts,futureDateYear);
+		assertEquals(5, cm.getFutureMeetingList(futureDateYear).get(0).getId());
+	}
+	
+	@Test 
+	public void testFileReadNextContactIDCorrectFirst() 
+	{
+		cm.addNewContact("Extra Added", "Next contact");
+		assertEquals(1,getOnlyContactFromSet(cm.getContacts("Extra Added")).getId());
+	}
+	
+	@Test 
+	public void testFileReadNextMeetingIDCorrectFirst() 
+	{
+		copyFile(testContactsFile,contactFile);
+		
+		cm = new ContactManagerImpl();
+		
+		Set<Contact> contacts = new HashSet<Contact>();
+		contacts.add(c1);
+		contacts.add(c2);
+		
+		cm.addFutureMeeting(contacts,futureDateYear);
+		assertEquals(1, cm.getFutureMeetingList(futureDateYear).get(0).getId());
+	}
 	
 	// Test addFutureMeeting()
 	
@@ -69,13 +269,16 @@ public class TestContactManagerImpl {
 	
 	@Test public void testAddFutureMeetingTodaysDateFuture() {}
 	
+	@Test public void testAddFutureMeetingFileUpdatedFirstMeeting() {}
+	
+	@Test public void testAddFutureMeetingFileUpdatedSecondMeeting() {}
+	
+	
 	// Test ID increments for meeting from addFutureMeeting()
 	
 	@Test public void testAddFutureMeetingIDFirst() {}
 	
 	@Test public void testAddFutureMeetingIDSecond() {}
-	
-	@Test public void testAddFutureMeetingIDIncrementWhenFirstRunAfterLoad() {} 
 	
 	// Test getPastMeeting()
 	
@@ -177,6 +380,8 @@ public class TestContactManagerImpl {
 	
 	@Test public void testAddPastMeetingSecond() {}
 	
+	@Test public void testAddPastMeetingFileUpdated() {}
+	
 	// Test addMeetingNotes()
 	
 	@Test public void testAddMeetingNotesMeetingNotExistException() {}
@@ -195,6 +400,8 @@ public class TestContactManagerImpl {
 	
 	@Test public void testAddMeetingNotesMeetingNoteNotEmptyNotesEmpty() {}
 	
+	@Test public void testAddMeetingNotesFileUpdated() {}
+	
 	// Test addNewContact()
 	
 	@Test public void testAddNewContactNameNullException() {}
@@ -206,6 +413,10 @@ public class TestContactManagerImpl {
 	@Test public void testAddNewContactSecondContactIDNum() {}
 	
 	@Test public void testAddNewContactValue() {}
+	
+	@Test public void testAddNewContactFileUpdatedFirst() {}
+	
+	@Test public void testAddNewContactFileUpdatedSecond() {}
 	
 	// Test getContacts(int)
 	
