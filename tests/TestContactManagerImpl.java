@@ -3,6 +3,7 @@ package tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import impls.Clock;
 import impls.ContactImpl;
 import impls.ContactManagerImpl;
 import impls.FutureMeetingImpl;
@@ -35,14 +36,22 @@ import org.junit.Test;
 
 public class TestContactManagerImpl {
 
-	Calendar currentDate;
+	final Calendar currentDate = new GregorianCalendar(2010,6,6,12,10,30);
 	
-	Calendar futureDateMonth;
-	Calendar futureDateYear;
-	Calendar futureDateMinute;
-	Calendar pastDateMonth;
-	Calendar pastDateYear;
-	Calendar pastDateMinute;
+	final Calendar futureDateYear= new GregorianCalendar(2011,5,5,11,9,28);
+	final Calendar futureDateMonth= new GregorianCalendar(2010,7,5,11,9,28);
+	final Calendar futureDateDay= new GregorianCalendar(2010,6,7,11,9,28);
+	final Calendar futureDateHour= new GregorianCalendar(2010,6,6,13,9,28);
+	final Calendar futureDateMinute= new GregorianCalendar(2010,6,6,12,11,28);
+	final Calendar futureDateSecond= new GregorianCalendar(2010,6,6,12,11,31);
+	
+	final Calendar pastDateYear= new GregorianCalendar(2009,7,7,13,11,31);
+	final Calendar pastDateMonth= new GregorianCalendar(2010,5,7,13,11,31);
+	final Calendar pastDateDay= new GregorianCalendar(2010,6,5,13,11,31);
+	final Calendar pastDateHour= new GregorianCalendar(2010,6,6,11,11,31);
+	final Calendar pastDateMinute= new GregorianCalendar(2010,6,6,12,11,31);
+	final Calendar pastDateSecond= new GregorianCalendar(2010,6,6,12,10,29);
+	
 
 	
 	final File contactFile = new File("Contact.txt");
@@ -74,10 +83,12 @@ public class TestContactManagerImpl {
 	
 	Contact c1, c2, c3;
 	
+	Set<Contact> contacts1, contacts2, contacts3;
+	
 	Meeting m1, m2, m3, m4;
 	
 	
-	ContactManager cm;
+	ContactManager cm, cm3Contacts, cm2Contacts, cm1Contacts;
 	
 	/*
 	 * TODO: What if the meeting is set on the same day, do we signify time as well?
@@ -95,6 +106,10 @@ public class TestContactManagerImpl {
 	 * TODO: Measure chronologically within seconds
 	 * TODO: TEst updated with each method that can be run and change
 	 * TODO: Test files after all excpetions
+	 * TODO: Times to test, 11 months,27 days - for year, +1 year - 1 second
+	 * 				- for month - 
+	 * TODO: Create own clock to use, and a test file checking that clock works properly, also testing that, without settings
+	 * 			it uses a proper date (put in a past and future meeting and check it sees it as such)
 	 * 
 	 * Things to test:
 	 * 
@@ -124,22 +139,11 @@ public class TestContactManagerImpl {
 		return null;
 	}
 	
-	public void setUpDates()
-	{
-		currentDate = new GregorianCalendar();
-		(futureDateYear= new GregorianCalendar()).add(Calendar.YEAR,1);
-		(futureDateMonth= new GregorianCalendar()).add(Calendar.MONTH,1);
-		(futureDateMinute= new GregorianCalendar()).add(Calendar.MINUTE,1);	
-		(pastDateYear= new GregorianCalendar()).add(Calendar.YEAR,-1);
-		(pastDateMonth= new GregorianCalendar()).add(Calendar.MONTH,-1);
-		(pastDateMinute= new GregorianCalendar()).add(Calendar.MINUTE,-1);
-	}
-	
 	
 	@Before 
 	public void cleanStart()
 	{
-		setUpDates();
+		Clock.setTime(currentDate);
 		
 		if (contactFile.exists()) contactFile.delete(); 
 		cm = new ContactManagerImpl();
@@ -147,6 +151,28 @@ public class TestContactManagerImpl {
 		c1 = new ContactImpl(1,"Bob","Nice guy");
 		c2 = new ContactImpl(2,"Fred","Talks too much");
 		c3 = new ContactImpl(3, "Anon", "");
+		
+		contacts1 = new HashSet<Contact>();
+		contacts1.add(c1);
+		
+		contacts2 = new HashSet<Contact>();
+		contacts2.add(c1);
+		contacts2.add(c2);
+		
+		contacts3 = new HashSet<Contact>();
+		contacts3.add(c1);
+		contacts3.add(c2);
+		contacts3.add(c3);
+		
+		cm1Contacts.addNewContact("Bob","Nice guy");
+		
+		cm2Contacts.addNewContact("Bob","Nice guy");
+		cm2Contacts.addNewContact("Fred","Talks too much");
+		
+		cm3Contacts.addNewContact("Bob","Nice guy");
+		cm3Contacts.addNewContact("Fred","Talks too much");
+		cm3Contacts.addNewContact("Anon","");
+		
 		
 		m1 = new MeetingImpl(1,null,null); //TODO: Add proper meetings in here
 		m2 = new PastMeetingImpl(); //TODO: Add proper meetings in here
@@ -251,27 +277,84 @@ public class TestContactManagerImpl {
 	
 	// Test addFutureMeeting()
 	
-	@Test public void testAddFutureMeetingPastDateException() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddFutureMeetingPastDateExceptionYear() {
+		cm3Contacts.addFutureMeeting(contacts2,pastDateYear);
+	}
 	
-	@Test public void testAddFutureMeetingUnknownContactNoContactsStoredException() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testAddFutureMeetingPastDateExceptionMonth() {
+		cm3Contacts.addFutureMeeting(contacts2,pastDateMonth);
+	}
 	
-	@Test public void testAddFutureMeetingUnknownContactContactsStoredException() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testAddFutureMeetingPastDateExceptionDay() {
+		cm3Contacts.addFutureMeeting(contacts2,pastDateDay);
+	}
 	
-	@Test public void testAddFutureMeetingUnknownContactNotFirstInListException() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testAddFutureMeetingPastDateExceptionHour() {
+		cm3Contacts.addFutureMeeting(contacts2,pastDateHour);
+	}
 	
-	@Test public void testAddFutureMeetingContactFoundNotFirstInList() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testAddFutureMeetingPastDateExceptionMinute() {
+		cm3Contacts.addFutureMeeting(contacts2,pastDateMinute);
+	}
 	
-	@Test public void testAddFutureMeetingStoredWhenNoCurrentMeetings() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testAddFutureMeetingPastDateExceptionSecond() {
+		cm3Contacts.addFutureMeeting(contacts2,pastDateSecond);
+	}
 	
-	@Test public void testAddFutureMeetingStoredWhenCurrentMeetings() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddFutureMeetingUnknownContactNoContactsStoredException() {
+		cm.addFutureMeeting(contacts2,futureDateYear);
+	}
 	
-	@Test public void testAddFutureMeetingTodaysDatePast() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddFutureMeetingUnknownContactContactsStoredException() {
+
+		Set<Contact> solo = new HashSet<Contact>();
+		solo.add(new ContactImpl(5,"Unknown guy","Dont take sweets from him."));
+		cm3Contacts.addFutureMeeting(solo,futureDateYear);
+	}
 	
-	@Test public void testAddFutureMeetingTodaysDateFuture() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddFutureMeetingUnknownContactNotFirstInListException() {
+		cm2Contacts.addFutureMeeting(contacts3,futureDateYear);
+	}
 	
-	@Test public void testAddFutureMeetingFileUpdatedFirstMeeting() {}
+	@Test 
+	public void testAddFutureMeetingContactFoundNotFirstInList() {
+		
+	}
 	
-	@Test public void testAddFutureMeetingFileUpdatedSecondMeeting() {}
+	@Test 
+	public void testAddFutureMeetingStoredWhenNoCurrentMeetings() {
+		
+	}
+	
+	@Test 
+	public void testAddFutureMeetingStoredWhenCurrentMeetings() {
+		
+	}
+	
+	@Test public void testAddFutureMeetingTodaysDatePast() {
+		//go through all future dates
+	}
+	
+	@Test public void testAddFutureMeetingTodaysDateFuture() {
+		
+	}
+	
+	@Test public void testAddFutureMeetingFileUpdatedFirstMeeting() {
+		
+	}
+	
+	@Test public void testAddFutureMeetingFileUpdatedSecondMeeting() {
+		
+	}
 	
 	
 	// Test ID increments for meeting from addFutureMeeting()
