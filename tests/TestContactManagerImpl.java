@@ -326,36 +326,54 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
-	public void testAddFutureMeetingContactFoundNotFirstInList() {
-		
+	public void testAddFutureMeetingContactFoundFirstInList() {
+		cm2Contacts.addFutureMeeting(contacts1,futureDateYear);
+	}
+	
+	@Test 
+	public void testAddFutureMeetingContactFoundMultiple() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateYear);
 	}
 	
 	@Test 
 	public void testAddFutureMeetingStoredWhenNoCurrentMeetings() {
-		
+		cm2Contacts.addFutureMeeting(contacts2,futureDateYear);
+		ContactManager tempCM = new ContactManagerImpl();
+		assertEquals(new MeetingImpl(1,futureDateYear,contacts2),tempCM.getFutureMeeting(1));
 	}
 	
 	@Test 
 	public void testAddFutureMeetingStoredWhenCurrentMeetings() {
-		
+		cm2Contacts.addFutureMeeting(contacts2,futureDateYear);
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		ContactManager tempCM = new ContactManagerImpl();
+		assertEquals(new MeetingImpl(1,futureDateDay,contacts2),tempCM.getFutureMeeting(2));
 	}
 	
-	@Test public void testAddFutureMeetingTodaysDatePast() {
-		//go through all future dates
+	@Test public void testAddFutureMeetingFutureDateYear() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateYear);
+		assertEquals(new MeetingImpl(1,futureDateYear,contacts2),cm2Contacts.getFutureMeeting(1));
 	}
-	
-	@Test public void testAddFutureMeetingTodaysDateFuture() {
-		
+	@Test public void testAddFutureMeetingFutureDateMonth() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateMonth);
+		assertEquals(new MeetingImpl(1,futureDateMonth,contacts2),cm2Contacts.getFutureMeeting(1));
 	}
-	
-	@Test public void testAddFutureMeetingFileUpdatedFirstMeeting() {
-		
+	@Test public void testAddFutureMeetingFutureDateDay() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		assertEquals(new MeetingImpl(1,futureDateDay,contacts2),cm2Contacts.getFutureMeeting(1));
 	}
-	
-	@Test public void testAddFutureMeetingFileUpdatedSecondMeeting() {
-		
+	@Test public void testAddFutureMeetingFutureDateHour() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateHour);
+		assertEquals(new MeetingImpl(1,futureDateHour,contacts2),cm2Contacts.getFutureMeeting(1));
 	}
-	
+	@Test public void testAddFutureMeetingFutureDateMinute() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateMinute);
+		assertEquals(new MeetingImpl(1,futureDateMinute,contacts2),cm2Contacts.getFutureMeeting(1));
+	}
+	@Test public void testAddFutureMeetingFutureDateSecond() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateSecond);
+		assertEquals(new MeetingImpl(1,futureDateSecond,contacts2),cm2Contacts.getFutureMeeting(1));
+	}	
 	
 	// Test ID increments for meeting from addFutureMeeting()
 	
