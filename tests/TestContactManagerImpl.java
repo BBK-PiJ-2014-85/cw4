@@ -1,6 +1,8 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import impls.Clock;
@@ -377,9 +379,19 @@ public class TestContactManagerImpl {
 	
 	// Test ID increments for meeting from addFutureMeeting()
 	
-	@Test public void testAddFutureMeetingIDFirst() {}
+	@Test public void testAddFutureMeetingIDFirst() 
+	{
+		assertNull(cm2Contacts.getFutureMeeting(1));
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		assertNotNull(cm2Contacts.getFutureMeeting(1));
+	}
 	
-	@Test public void testAddFutureMeetingIDSecond() {}
+	@Test public void testAddFutureMeetingIDSecond() {
+		assertNull(cm2Contacts.getFutureMeeting(2));
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2,futureDateMonth);
+		assertNotNull(cm2Contacts.getFutureMeeting(2));
+	}
 	
 	// Test getPastMeeting()
 	
