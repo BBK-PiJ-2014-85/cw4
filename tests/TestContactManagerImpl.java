@@ -100,6 +100,9 @@ public class TestContactManagerImpl {
 	 * TODO: how do we do something on program close? Will need to test this in several places, for now, just have a flush
 	 * 			after every method that can run?
 	 * TODO: Can we assume that multiple cannot be run at the same time?
+	 * TODO: Do Meetings automatically convert into a past meeting dependent on date? It looks like it may only be done when notes are added. 
+	 * 			- For example, List<PastMeeting> getPastMeeting only to return those with notes added? (And not those added in future but now past)
+	 * 
 	 * 
 	 * TODO: ME: Test things dont get removed when getting
 	 * TODO: ME: Add an equals method to contact to make comparing easy 
@@ -393,25 +396,68 @@ public class TestContactManagerImpl {
 		assertNotNull(cm2Contacts.getFutureMeeting(2));
 	}
 	
+	@Test public void testAddFutureMeetingIDSecondOnLoad() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		ContactManager tempCM = new ContactManagerImpl();
+		assertNull(tempCM.getFutureMeeting(2));
+		tempCM.addFutureMeeting(contacts2,futureDateMonth);
+		assertNotNull(tempCM.getFutureMeeting(2));
+	}
+	
 	// Test getPastMeeting()
 	
-	@Test public void testGetPastMeetingFutureIdExistsException() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testGetPastMeetingFutureIdExistsExceptionFirst() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		cm2Contacts.getPastMeeting(1);
+	}
 	
-	@Test public void testGetPastMeetingNotExist() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testGetPastMeetingFutureIdExistsExceptionSecond() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2,futureDateMonth);
+		cm2Contacts.getPastMeeting(2);
+	}
+
+	@Test 
+	public void testGetPastMeetingFutureMeetingWhenAddedNowPast() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
+		
+		Clock.setTime(new GregorianCalendar(2050,01,01));
+		
+		assertEquals(new PastMeetingImpl(new MeetingImpl(1,futureDateDay,contacts2)),cm2Contacts.getPastMeeting(1));
+	}
 	
-	@Test public void testGetPastMeetingListEmpty() {}
+	@Test 
+	public void testGetPastMeetingNotExist() {
+		cm2Contacts.addFutureMeeting(contacts2,pastDateDay);
+		assertNull(cm2Contacts.getPastMeeting(2));		
+	}
 	
-	@Test public void testGetPastMeetingFirstItemInList() {}
+	@Test 
+	public void testGetPastMeetingListEmpty() {
+		assertNull(cm2Contacts.getPastMeeting(2));
+	}
 	
-	@Test public void testGetPastMeetingSecondItemInList() {}
+	@Test 
+	public void testGetPastMeetingFirstItemInList() {
+		cm2Contacts.addFutureMeeting(contacts2,pastDateDay);
+	}
 	
-	@Test public void testGetPastMeetingSameDayButPast() {}
+	@Test 
+	public void testGetPastMeetingSecondItemInList() {}
 	
-	@Test public void testGetPastMeetingSameDayButFuture() {}
+	@Test 
+	public void testGetPastMeetingSameDayButPast() {}
+	
+	@Test 
+	public void testGetPastMeetingSameDayButFuture() {}
 	
 	// Test getFutureMeeting()
 	
-	@Test public void testGetFutureMeetingFutureIdExistsException() {}
+	@Test public void testGetFutureMeetingFutureIdExistsExceptionFirst() {}
+	
+	@Test public void testGetFutureMeetingFutureIdExistsExceptionSecond() {}
 	
 	@Test public void testGetFutureMeetingNotExist() {}
 	
