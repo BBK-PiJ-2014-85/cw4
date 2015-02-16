@@ -4,10 +4,13 @@ import java.util.Calendar;
 import java.util.Set;
 
 import interfaces.Contact;
+import interfaces.Meeting;
 import interfaces.PastMeeting;
 
 public class PastMeetingImpl implements PastMeeting {
 
+	public PastMeetingImpl(Meeting currentMeeting) {}
+	
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
