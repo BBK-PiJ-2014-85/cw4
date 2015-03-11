@@ -117,6 +117,8 @@ public class TestContactManagerImpl {
 	 * TODO: Create own clock to use, and a test file checking that clock works properly, also testing that, without settings
 	 * 			it uses a proper date (put in a past and future meeting and check it sees it as such)
 	 * TODO: ME: getFutureMeeting test cases when have pastmeeting between two futures to ensure it checks on
+	 * TODO: ME: An equals statement within classes would let the comaprisons be much easier
+	 * TODO ME: Make sure null notes are ok from future meeting
 	 * 
 	 * Things to test:
 	 * 
@@ -500,17 +502,20 @@ public class TestContactManagerImpl {
 		cm2Contacts.getFutureMeeting(1);
 	}
 	
-	@Test public void testGetFutureMeetingNotExist() {
+	@Test 
+	public void testGetFutureMeetingNotExist() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
 		
 		assertNull(cm2Contacts.getFutureMeeting(2));
 	}
 	
-	@Test public void testGetFutureMeetingListEmpty() {
+	@Test 
+	public void testGetFutureMeetingListEmpty() {
 		assertNull(cm2Contacts.getFutureMeeting(2));
 	}
 	
-	@Test public void testGetFutureMeetingFirstItemInList() {
+	@Test 
+	public void testGetFutureMeetingFirstItemInList() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
 		
@@ -518,7 +523,8 @@ public class TestContactManagerImpl {
 		assertEquals(futureDateDay,cm2Contacts.getFutureMeeting(1).getDate());
 	}
 	
-	@Test public void testGetFutureMeetingSecondItemInList() {
+	@Test 
+	public void testGetFutureMeetingSecondItemInList() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
 		
@@ -532,7 +538,8 @@ public class TestContactManagerImpl {
 		cm2Contacts.getFutureMeeting(1);
 	}
 	
-	@Test public void testGetFutureMeetingSameDayButFuture() {
+	@Test
+	public void testGetFutureMeetingSameDayButFuture() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateSecond);
 		assertEquals(contacts2,cm2Contacts.getFutureMeeting(1).getContacts());
 		assertEquals(futureDateSecond,cm2Contacts.getFutureMeeting(1).getDate());
@@ -540,13 +547,40 @@ public class TestContactManagerImpl {
 	
 	// Test getMeeting()
 	
-	@Test public void testGetMeetingNotExist() {}
+	@Test 
+	public void testGetMeetingNotExist() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateSecond);
+		assertNull(cm2Contacts.getMeeting(2));
+	}
 	
-	@Test public void testGetMeetingListEmpty() {}
+	@Test 
+	public void testGetMeetingListEmpty() {
+		assertNull(cm2Contacts.getMeeting(2));
+	}
 	
-	@Test public void testGetMeetingFirstItemInList() {}
+	@Test 
+	public void testGetMeetingFirstItemInList() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		assertEquals(contacts2, cm2Contacts.getMeeting(1).getContacts());
+		assertEquals(futureDateDay, cm2Contacts.getMeeting(1).getDate());
+	}
 	
-	@Test public void testGetMeetingSecondItemInList() {}
+	@Test 
+	public void testGetMeetingPastSecondItemInList() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past Meeting");
+		assertEquals(contacts2, cm2Contacts.getMeeting(2).getContacts());
+		assertEquals(pastDateDay, cm2Contacts.getMeeting(2).getDate());
+		assertEquals("Past Meeting", ((PastMeeting)cm2Contacts.getMeeting(2)).getNotes());
+	}
+	
+	@Test 
+	public void testGetMeetingFutureSecondItemInList() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		assertEquals(contacts2, cm2Contacts.getMeeting(2).getContacts());
+		assertEquals(futureDateMonth, cm2Contacts.getMeeting(2).getDate());
+	}
 	
 	// Test getFutureMeetingList(Contact)
 	
