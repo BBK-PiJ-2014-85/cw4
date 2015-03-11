@@ -107,6 +107,9 @@ public class TestContactManagerImpl {
 	 * TODO: What does meeting not contain duplicates mean for getFutureMeetingList. Which one to keep if different contacts? 
 	 * TODO: Which was is chronological order?
 	 * TODO: Assumed addNewPastMeeting() returns exception if the date is actually in the future
+	 * TODO: Assume addMeetingNotes() NullPOinterException is only for those being input, not already null
+	 * TODO: Assume if adding notes to one which notes already exist, it overwrites?
+	 * TODO: 
 	 * 
 	 * TODO: ME: Test things dont get removed when getting
 	 * TODO: ME: Add an equals method to contact to make comparing easy 
@@ -981,6 +984,14 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
+	public void testAddPastMeetingEmptyNotes() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "");
+		assertEquals(pastDateMonth, cm2Contacts.getMeeting(1).getDate());
+		assertEquals(contacts2,cm2Contacts.getMeeting(1).getContacts());
+		assertEquals("",((PastMeeting)cm2Contacts.getMeeting(1)).getNotes());
+	}
+	
+	@Test 
 	public void testAddPastMeetingSecond() {
 		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "First meeting");
 		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Second meeting");
@@ -995,23 +1006,73 @@ public class TestContactManagerImpl {
 	
 	// Test addMeetingNotes()
 	
-	@Test public void testAddMeetingNotesMeetingNotExistException() {}
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddMeetingNotesMeetingNotExistException() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addMeetingNotes(2,"Meeting didnt exist");
+	}
 	
-	@Test public void testAddMeetingNotesDateFutureException() {}
+	@Test(expected=IllegalStateException.class)
+	public void testAddMeetingNotesDateFutureException() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addMeetingNotes(1,"Meeting hadnt yet happened");
+	}
 	
-	@Test public void testAddMeetingNotesDateFutureButSameDayException() {}
 	
-	@Test public void testAddMeetingNotesNotesNullException() {}
+	@Test(expected=NullPointerException.class) 
+	public void testAddMeetingNotesNotesNullException() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		Clock.setTime(new GregorianCalendar(2050,01,01));
+		
+		cm2Contacts.addMeetingNotes(1,null);
+	}
 	
-	@Test public void testAddMeetingNotesMeetingNotesEmpty() {}
+	@Test 
+	public void testAddMeetingNotesMeetingNotesEmptyFirstMeeting() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		Clock.setTime(new GregorianCalendar(2050,01,01));
+		
+		cm2Contacts.addMeetingNotes(1,"That was fun");
+		
+		assertEquals("That was fun", ((PastMeeting)cm2Contacts.getMeeting(1)).getNotes());
+	}
 	
-	@Test public void testAddMeetingNotesMeetingNotesNotEmpty() {}
+	@Test 
+	public void testAddMeetingNotesMeetingNotesEmptySecondMeeting() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateYear);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		Clock.setTime(new GregorianCalendar(2050,01,01));
+		
+		cm2Contacts.addMeetingNotes(2,"That was fun");
+		
+		assertEquals("That was fun", ((PastMeeting)cm2Contacts.getMeeting(2)).getNotes());
+	}
 	
-	@Test public void testAddMeetingNotesMeetingNotesEmptyNewNotesEmpty() {}
+	@Test 
+	public void testAddMeetingNotesMeetingNotesNotEmpty() {
+		fail("May not be required depending on spec clarification");
+	}
 	
-	@Test public void testAddMeetingNotesMeetingNoteNotEmptyNotesEmpty() {}
+	@Test 
+	public void testAddMeetingNotesMeetingNotesEmptyNewNotesEmpty() {
+		fail("May not be required depending on spec clarification");
+	}
 	
-	@Test public void testAddMeetingNotesFileUpdated() {}
+	@Test 
+	public void testAddMeetingNotesMeetingNoteNotEmptyNotesEmpty() {
+		fail("May not be required depending on spec clarification");
+	}
+	
+	@Test
+	public void testAddMeetingNotesToNotesAlreadyExisting()
+	{
+		fail("Need clarification before I know what to do here");
+	}
+	
+	@Test 
+	public void testAddMeetingNotesFileUpdated() {
+		fail("To be determined if this is the right approach");
+	}
 	
 	// Test addNewContact()
 	
