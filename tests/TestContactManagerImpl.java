@@ -104,7 +104,7 @@ public class TestContactManagerImpl {
 	 * TODO: Can we assume that multiple cannot be run at the same time?
 	 * TODO: Do Meetings automatically convert into a past meeting dependent on date? It looks like it may only be done when notes are added. 
 	 * 			- For example, List<PastMeeting> getPastMeeting only to return those with notes added? (And not those added in future but now past)
-	 * TODO: What does meeting not contain duplicates mean for getFutureMeetingList 
+	 * TODO: What does meeting not contain duplicates mean for getFutureMeetingList. Which one to keep if different contacts? 
 	 * TODO: Which was is chronological order?
 	 * 
 	 * TODO: ME: Test things dont get removed when getting
@@ -685,11 +685,62 @@ public class TestContactManagerImpl {
 	
 	// Test getFutureMeetingList(Calendar)
 	
-	@Test public void testGetFutureListDateNoMeetings() {}
+	@Test 
+	public void testGetFutureListDateNoMeetingsMatch() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		
+		assertTrue(cm2Contacts.getFutureMeetingList(futureDateYear).isEmpty());
+	}
 	
-	@Test public void testGetFutureListDateTodayBothPastAndFuture() {}
+	@Test
+	public void testGetFutureListDateNoMeetings()
+	{
+		assertTrue(cm2Contacts.getFutureMeetingList(futureDateYear).isEmpty());
+	}
 	
-	@Test public void testGetFutureListDateSortedChronological() {}
+	@Test 
+	public void testGetFutureListDateTodayBothPastAndFuture() {
+		cm2Contacts.addNewPastMeeting(contacts2,pastDateMonth, "Old meeting");
+		cm2Contacts.addNewPastMeeting(contacts3, pastDateMinute, "A recent past meeting");
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMinute);
+		cm2Contacts.addFutureMeeting(contacts3, futureDateHour);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(pastDateMinute);
+		assertEquals(3, rtn.size());
+		
+		assertEquals(pastDateMinute, rtn.get(0).getDate());
+		assertEquals(contacts3, rtn.get(0).getContacts());
+		assertEquals(futureDateMinute, rtn.get(1).getDate());
+		assertEquals(contacts2, rtn.get(1).getContacts());
+		assertEquals(futureDateHour, rtn.get(2).getDate());
+		assertEquals(contacts3, rtn.get(2).getContacts());
+	}
+	
+	@Test 
+	public void testGetFutureListDateSortedChronological() {
+		cm2Contacts.addFutureMeeting(contacts3, futureDateHour);
+		cm2Contacts.addNewPastMeeting(contacts2,pastDateMonth, "Old meeting");
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMinute);
+		cm2Contacts.addNewPastMeeting(contacts3, pastDateMinute, "A recent past meeting");
+
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(pastDateMinute);
+		assertEquals(3, rtn.size());
+		
+		assertEquals(pastDateMinute, rtn.get(0).getDate());
+		assertEquals(contacts3, rtn.get(0).getContacts());
+		assertEquals(futureDateMinute, rtn.get(1).getDate());
+		assertEquals(contacts2, rtn.get(1).getContacts());
+		assertEquals(futureDateHour, rtn.get(2).getDate());
+		assertEquals(contacts3, rtn.get(2).getContacts());
+	}
+	
+	@Test 
+	void testGetFutureListDateRemoveDuplicateTime(){
+		fail("Need this clarified. What duplicates need to be removed? All the same or just on date?");
+	}
 	
 	// Test getPastMeetingList(Contact)
 	
