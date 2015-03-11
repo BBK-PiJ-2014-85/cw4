@@ -14,6 +14,7 @@ import impls.PastMeetingImpl;
 import interfaces.Contact;
 import interfaces.ContactManager;
 import interfaces.Meeting;
+import interfaces.PastMeeting;
 
 import java.io.File;
 import java.io.IOException;
@@ -441,17 +442,38 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testGetPastMeetingFirstItemInList() {
-		cm2Contacts.addFutureMeeting(contacts2,pastDateDay);
+		cm2Contacts.addNewPastMeeting(contacts2,pastDateDay,"First meeting in list");
+		cm2Contacts.addNewPastMeeting(contacts1,pastDateMonth,"Second meeting in list");
+		
+		PastMeeting pm = cm2Contacts.getPastMeeting(1);
+		assertEquals(pastDateDay,pm.getDate());
+		assertEquals(contacts2,pm.getContacts());
 	}
 	
 	@Test 
-	public void testGetPastMeetingSecondItemInList() {}
+	public void testGetPastMeetingSecondItemInList() {
+		cm2Contacts.addNewPastMeeting(contacts2,pastDateDay,"First meeting in list");
+		cm2Contacts.addNewPastMeeting(contacts1,pastDateMonth,"Second meeting in list");
+		
+		PastMeeting pm = cm2Contacts.getPastMeeting(2);
+		assertEquals(pastDateMonth,pm.getDate());
+		assertEquals(contacts1,pm.getContacts());
+	}
 	
 	@Test 
-	public void testGetPastMeetingSameDayButPast() {}
+	public void testGetPastMeetingSameDayButPast() {
+		cm2Contacts.addNewPastMeeting(contacts2,pastDateSecond,"First meeting in list");
+		
+		PastMeeting pm = cm2Contacts.getPastMeeting(1);
+		assertEquals(pastDateSecond,pm.getDate());
+		assertEquals(contacts2,pm.getContacts());
+	}
 	
-	@Test 
-	public void testGetPastMeetingSameDayButFuture() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testGetPastMeetingSameDayButFuture() {
+		cm2Contacts.addFutureMeeting(contacts2,futureDateSecond);
+		cm2Contacts.getPastMeeting(1);
+	}
 	
 	// Test getFutureMeeting()
 	
