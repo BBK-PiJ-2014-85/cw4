@@ -116,6 +116,7 @@ public class TestContactManagerImpl {
 	 * 				- for month - 
 	 * TODO: Create own clock to use, and a test file checking that clock works properly, also testing that, without settings
 	 * 			it uses a proper date (put in a past and future meeting and check it sees it as such)
+	 * TODO: ME: getFutureMeeting test cases when have pastmeeting between two futures to ensure it checks on
 	 * 
 	 * Things to test:
 	 * 
@@ -477,21 +478,65 @@ public class TestContactManagerImpl {
 	
 	// Test getFutureMeeting()
 	
-	@Test public void testGetFutureMeetingFutureIdExistsExceptionFirst() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testGetFutureMeetingFutureIdExistsExceptionFirst() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "First Meeting in past");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Second Meeting in past");
+		cm2Contacts.getFutureMeeting(1);
+	}
 	
-	@Test public void testGetFutureMeetingFutureIdExistsExceptionSecond() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testGetFutureMeetingFutureIdExistsExceptionSecond() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "First Meeting in past");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Second Meeting in past");
+		cm2Contacts.getFutureMeeting(2);
+	}
 	
-	@Test public void testGetFutureMeetingNotExist() {}
+	@Test(expected=IllegalArgumentException.class)  
+	public void testGetFutureMeetingMeetingWasFutureNowInPastException() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		
+		Clock.setTime(new GregorianCalendar(2050,01,01));
+		cm2Contacts.getFutureMeeting(1);
+	}
 	
-	@Test public void testGetFutureMeetingListEmpty() {}
+	@Test public void testGetFutureMeetingNotExist() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		
+		assertNull(cm2Contacts.getFutureMeeting(2));
+	}
 	
-	@Test public void testGetFutureMeetingFirstItemInList() {}
+	@Test public void testGetFutureMeetingListEmpty() {
+		assertNull(cm2Contacts.getFutureMeeting(2));
+	}
 	
-	@Test public void testGetFutureMeetingSecondItemInList() {}
+	@Test public void testGetFutureMeetingFirstItemInList() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		
+		assertEquals(contacts2,cm2Contacts.getFutureMeeting(1).getContacts());
+		assertEquals(futureDateDay,cm2Contacts.getFutureMeeting(1).getDate());
+	}
 	
-	@Test public void testGetFutureMeetingSameDayButPast() {}
+	@Test public void testGetFutureMeetingSecondItemInList() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		
+		assertEquals(contacts2,cm2Contacts.getFutureMeeting(2).getContacts());
+		assertEquals(futureDateMonth,cm2Contacts.getFutureMeeting(2).getDate());
+	}
 	
-	@Test public void testGetFutureMeetingSameDayButFuture() {}
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetFutureMeetingSameDayButPast() {
+		cm2Contacts.addFutureMeeting(contacts2, pastDateSecond);
+		cm2Contacts.getFutureMeeting(1);
+	}
+	
+	@Test public void testGetFutureMeetingSameDayButFuture() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateSecond);
+		assertEquals(contacts2,cm2Contacts.getFutureMeeting(1).getContacts());
+		assertEquals(futureDateSecond,cm2Contacts.getFutureMeeting(1).getDate());
+	}
 	
 	// Test getMeeting()
 	
