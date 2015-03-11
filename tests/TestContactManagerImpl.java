@@ -106,6 +106,7 @@ public class TestContactManagerImpl {
 	 * 			- For example, List<PastMeeting> getPastMeeting only to return those with notes added? (And not those added in future but now past)
 	 * TODO: What does meeting not contain duplicates mean for getFutureMeetingList. Which one to keep if different contacts? 
 	 * TODO: Which was is chronological order?
+	 * TODO: Assumed addNewPastMeeting() returns exception if the date is actually in the future
 	 * 
 	 * TODO: ME: Test things dont get removed when getting
 	 * TODO: ME: Add an equals method to contact to make comparing easy 
@@ -908,27 +909,89 @@ public class TestContactManagerImpl {
 	
 	// Test addNewPastMeeting()
 	
-	@Test public void testAddPastMeetingContactsNullException() {}
+	@Test(expected=NullPointerException.class)
+	public void testAddPastMeetingContactsNullException() {
+		cm2Contacts.addNewPastMeeting(null, pastDateMonth, "null contacts");
+	}
 	
-	@Test public void testAddPastMeetingDateNullException() {}
+	@Test(expected=NullPointerException.class)
+	public void testAddPastMeetingDateNullException() {
+		cm2Contacts.addNewPastMeeting(contacts1, null, "null date");
+	}
 	
-	@Test public void testAddPastMeetingTestNullException() {}
+	@Test(expected=NullPointerException.class)
+	public void testAddPastMeetingTestNullException() {
+		cm2Contacts.addNewPastMeeting(contacts1, pastDateMonth, null);
+	}
 	
-	@Test public void testAddPastMeetingFirstContactNotExist() {}
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddPastMeetingFirstContactNotExist() {
+		Set<Contact> outsider = new HashSet<Contact>();
+		outsider.add(c3);
+		cm2Contacts.addNewPastMeeting(outsider, pastDateMonth, "Dont know who they guy who turned up was");
+	}
 	
-	@Test public void testAddPastMeetingSecondContactNotExist() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddPastMeetingSecondContactNotExist() {
+
+		cm1Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Didn't know who hos mate was");
+	}
 	
-	@Test public void testAddPastMeetingContactListEmpty() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddPastMeetingContactListEmpty() {
+		Set<Contact> noone = new HashSet<Contact>();
+		cm1Contacts.addNewPastMeeting(noone, pastDateMonth, "If noone was there, did it happen?");
+	}
 	
-	@Test public void testAddPastMeetingFirstID() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddPastMeetingDateInFuture() {
+		cm2Contacts.addNewPastMeeting(contacts1, futureDateMonth, "Future meeting should return exception?");
+	}
 	
-	@Test public void testAddPastMeetingSecondID() {}
 	
-	@Test public void testAddPastMeetingFirst() {}
+	@Test 
+	public void testAddPastMeetingFirstID() {
+		
+		assertNull(cm2Contacts.getMeeting(1));
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "First meeting");
+		assertNotNull(cm2Contacts.getMeeting(1));
+	}
 	
-	@Test public void testAddPastMeetingSecond() {}
+	@Test 
+	public void testAddPastMeetingSecondIDAfterPastMeetingAddedFirst() {	
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "First meeting");
+		assertNull(cm2Contacts.getMeeting(2));
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateYear, "Second meeting");
+		assertNotNull(cm2Contacts.getMeeting(2));
+	}
 	
-	@Test public void testAddPastMeetingFileUpdated() {}
+	@Test 
+	public void testAddPastMeetingSecondIDAfterFutureMeetingAddedFirst() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		assertNull(cm2Contacts.getMeeting(2));
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateYear, "Second meeting");
+		assertNotNull(cm2Contacts.getMeeting(2));
+	}
+	
+	@Test 
+	public void testAddPastMeetingFirst() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "First meeting");
+		assertEquals(pastDateMonth, cm2Contacts.getMeeting(1).getDate());
+		assertEquals(contacts2,cm2Contacts.getMeeting(1).getContacts());
+	}
+	
+	@Test 
+	public void testAddPastMeetingSecond() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "First meeting");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Second meeting");
+		assertEquals(pastDateMonth, cm2Contacts.getMeeting(2).getDate());
+		assertEquals(contacts2,cm2Contacts.getMeeting(2).getContacts());
+	}
+	
+	@Test 
+	public void testAddPastMeetingFileUpdated() {
+		fail("Need to determine how to test file updated, and where this needs to happen?");
+	}
 	
 	// Test addMeetingNotes()
 	
