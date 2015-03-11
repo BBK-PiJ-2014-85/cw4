@@ -11,6 +11,8 @@ public class PastMeetingImpl implements PastMeeting {
 
 	public PastMeetingImpl(Meeting currentMeeting) {}
 	
+	public PastMeetingImpl(){}
+	
 	@Override
 	public int getId() {
 		// TODO Auto-generated method stub
