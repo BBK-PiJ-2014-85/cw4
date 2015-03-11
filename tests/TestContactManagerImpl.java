@@ -24,6 +24,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
@@ -103,7 +104,8 @@ public class TestContactManagerImpl {
 	 * TODO: Can we assume that multiple cannot be run at the same time?
 	 * TODO: Do Meetings automatically convert into a past meeting dependent on date? It looks like it may only be done when notes are added. 
 	 * 			- For example, List<PastMeeting> getPastMeeting only to return those with notes added? (And not those added in future but now past)
-	 * 
+	 * TODO: What does meeting not contain duplicates mean for getFutureMeetingList 
+	 * TODO: Which was is chronological order?
 	 * 
 	 * TODO: ME: Test things dont get removed when getting
 	 * TODO: ME: Add an equals method to contact to make comparing easy 
@@ -119,6 +121,9 @@ public class TestContactManagerImpl {
 	 * TODO: ME: getFutureMeeting test cases when have pastmeeting between two futures to ensure it checks on
 	 * TODO: ME: An equals statement within classes would let the comaprisons be much easier
 	 * TODO ME: Make sure null notes are ok from future meeting
+	 * TODO: ME: create a contact manager with 2 future meetings, 2 past meetings etc.
+	 * 
+	 * 
 	 * 
 	 * Things to test:
 	 * 
@@ -584,17 +589,99 @@ public class TestContactManagerImpl {
 	
 	// Test getFutureMeetingList(Contact)
 	
-	@Test public void testGetFutureListContactNotExistException() {}
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetFutureListContactNotExistException() {
+		cm2Contacts.getFutureMeetingList(c3);
+	}
 	
-	@Test public void testGetFutureListContactPastMeetingsOnlyExist() {}
+	@Test 
+	public void testGetFutureListNoContactsExistException() {
+		cm.getFutureMeetingList(c3);
+	}
 	
-	@Test public void testGetFutureListContactFutureMeetingsOnlyExist() {}
+	@Test 
+	public void testGetFutureListContactPastMeetingsOnlyExist() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past Meeting 1");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Past Meeting 2");
+		
+		assertTrue(cm2Contacts.getFutureMeetingList(c1).isEmpty());
+	}
 	
-	@Test public void testGetFutureListContactNoMeetingsExist() {}
+	@Test 
+	public void testGetFutureListContactFutureMeetingWhenAddedNowPast() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		
+		Clock.setTime(new GregorianCalendar(2050,01,01));
+		
+		assertTrue(cm2Contacts.getFutureMeetingList(c1).isEmpty());
+		
+	}
 	
-	@Test public void testGetFutureListContactFutureAndPastMeetingsExist() {}
+	@Test 
+	public void testGetFutureListContactFutureMeetingsOnlyExist() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		
+		assertTrue(cm2Contacts.getFutureMeetingList(c3).isEmpty());
+	}
 	
-	@Test public void testGetFutureListContactListSortedChronologically() {}
+	@Test 
+	public void testGetFutureListContactNoMeetingsExist() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts3, futureDateMonth);
+		
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c2);
+		assertEquals(futureDateDay, rtn.get(0).getDate());
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(futureDateMonth, rtn.get(1).getDate());
+		assertEquals(contacts3, rtn.get(1).getContacts());
+		assertEquals(2,rtn.size());
+	}
+	
+	@Test 
+	public void testGetFutureListContactFutureAndPastMeetingsExist() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "A past meeting");
+		cm2Contacts.addFutureMeeting(contacts3, futureDateMonth);
+		
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c2);
+		assertEquals(futureDateDay, rtn.get(0).getDate());
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(futureDateMonth, rtn.get(1).getDate());
+		assertEquals(contacts3, rtn.get(1).getContacts());
+		assertEquals(2,rtn.size());
+	}
+	
+	@Test 
+	public void testGetFutureListContactOnlyContactMatchedMeetingsReturned() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts3, futureDateMonth);
+		cm2Contacts.addFutureMeeting(contacts3, futureDateYear);
+		
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c3);
+		assertEquals(futureDateMonth, rtn.get(0).getDate());
+		assertEquals(contacts3, rtn.get(0).getContacts());
+		assertEquals(futureDateYear, rtn.get(1).getDate());
+		assertEquals(contacts3, rtn.get(1).getContacts());
+		assertEquals(2,rtn.size());
+	}
+	
+	@Test 
+	public void testGetFutureListContactListSortedChronologically() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm2Contacts.addFutureMeeting(contacts2, futureDateYear);
+		
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c2);
+		assertEquals(futureDateDay, rtn.get(0).getDate());
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(futureDateMonth, rtn.get(1).getDate());
+		assertEquals(contacts2, rtn.get(1).getContacts());
+		assertEquals(futureDateYear, rtn.get(2).getDate());
+		assertEquals(contacts2, rtn.get(2).getContacts());
+		assertEquals(3,rtn.size());
+	}
 	
 	// Test getFutureMeetingList(Calendar)
 	
