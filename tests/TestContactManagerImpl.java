@@ -109,7 +109,7 @@ public class TestContactManagerImpl {
 	 * TODO: Assumed addNewPastMeeting() returns exception if the date is actually in the future
 	 * TODO: Assume addMeetingNotes() NullPOinterException is only for those being input, not already null
 	 * TODO: Assume if adding notes to one which notes already exist, it overwrites?
-	 * TODO: 
+	 * TODO: Should getContacts(String ) be case sensitive?
 	 * 
 	 * TODO: ME: Test things dont get removed when getting
 	 * TODO: ME: Add an equals method to contact to make comparing easy 
@@ -1076,19 +1076,49 @@ public class TestContactManagerImpl {
 	
 	// Test addNewContact()
 	
-	@Test public void testAddNewContactNameNullException() {}
+	@Test(expected=NullPointerException.class)
+	public void testAddNewContactNameNullException() {
+		cm2Contacts.addNewContact(null, "Little to say about him");
+	}
 	
-	@Test public void testAddNewContactNotesNullException() {}
+	@Test 
+	public void testAddNewContactNotesNullException() {
+		cm2Contacts.addNewContact("Bob", null);
+	}
 	
-	@Test public void testAddNewContactFirstContactIDNum() {}
+	@Test 
+	public void testAddNewContactFirstContactIDNum() {
+		
+		cm.addNewContact("Bob","First");
+		cm.getContacts(1);
+	}
 	
-	@Test public void testAddNewContactSecondContactIDNum() {}
+	@Test 
+	public void testAddNewContactSecondContactIDNum() {
+		cm1Contacts.addNewContact("Bob","Second");
+		cm.getContacts(2);
+	}
 	
-	@Test public void testAddNewContactValue() {}
+	@Test 
+	public void testAddNewContactValue() {
+
+		//will need to iterate through with iterator
+	}
 	
-	@Test public void testAddNewContactFileUpdatedFirst() {}
+	@Test 
+	public void testAddNewContactValueWithQuotations() {
+		
+	}
 	
-	@Test public void testAddNewContactFileUpdatedSecond() {}
+	@Test 
+	public void testAddNewContactFileUpdatedFirst() {
+		
+	}
+	
+	@Test 
+	public void testAddNewContactFileUpdatedSecond() {
+		
+	}
 	
 	// Test getContacts(int)
 	
