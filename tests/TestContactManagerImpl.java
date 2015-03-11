@@ -683,6 +683,28 @@ public class TestContactManagerImpl {
 		assertEquals(3,rtn.size());
 	}
 	
+	@Test
+	public void testGetFutureListFirstContactMatch()
+	{
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c1);
+		
+		assertEquals(1,rtn.size());
+		assertEquals(futureDateMonth, rtn.get(0).getDate());
+		assertEquals(contacts2, rtn.get(0).getContacts());
+	}
+	
+	@Test
+	public void testGetFutureListFirstSecondMatch()
+	{
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c2);
+		
+		assertEquals(1,rtn.size());
+		assertEquals(futureDateMonth, rtn.get(0).getDate());
+		assertEquals(contacts2, rtn.get(0).getContacts());
+	}
+	
 	// Test getFutureMeetingList(Calendar)
 	
 	@Test 
@@ -738,23 +760,151 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
-	void testGetFutureListDateRemoveDuplicateTime(){
+	public void testGetFutureListDateRemoveDuplicateTime(){
 		fail("Need this clarified. What duplicates need to be removed? All the same or just on date?");
 	}
 	
 	// Test getPastMeetingList(Contact)
 	
-	@Test public void testGetPastListContactNotExistException() {}
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetPastListContactNotExistException() {
+		cm2Contacts.getPastMeetingList(c3);
+	}
 	
-	@Test public void testGetPastListContactPastMeetingsOnlyExist() {}
+	@Test 
+	public void testGetPastListContactPastMeetingsOnlyExist() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Past meeting a month ago.");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past meeting a day ago.");
+		
+		List<PastMeeting> rtn =  cm2Contacts.getPastMeetingList(c2);
+		
+		assertEquals(2, rtn.size());
+		
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(pastDateMonth, rtn.get(0).getDate());
+		
+		assertEquals(contacts2, rtn.get(1).getContacts());
+		assertEquals(pastDateDay, rtn.get(0).getDate());
+	}
 	
-	@Test public void testGetPastListContactFutureMeetingsOnlyExist() {}
+	@Test
+	public void testGetPastListContactMatchedFutureAndPastExist()
+	{
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Past meeting a day ago.");
+		cm2Contacts.addFutureMeeting(contacts2, futureDateYear);
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past meeting a month ago.");
+		
+		List<PastMeeting> rtn =  cm2Contacts.getPastMeetingList(c2);
+		
+		assertEquals(2, rtn.size());
+		
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(pastDateMonth, rtn.get(0).getDate());
+		
+		assertEquals(contacts2, rtn.get(1).getContacts());
+		assertEquals(pastDateDay, rtn.get(1).getDate());
+	}
 	
-	@Test public void testGetPastListContactNoMeetingsExist() {}
+	@Test
+	public void testGetPastListContactSomeMatchFutureAndPast()
+	{
+		cm2Contacts.addFutureMeeting(contacts1, futureDateMonth);
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past meeting a day ago.");
+		cm2Contacts.addFutureMeeting(contacts2, futureDateYear);
+		cm2Contacts.addNewPastMeeting(contacts1, pastDateMonth, "Past meeting a month ago.");
+		
+		List<PastMeeting> rtn =  cm2Contacts.getPastMeetingList(c2);
+		
+		assertEquals(1, rtn.size());
+		
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(pastDateDay, rtn.get(0).getDate());
+	}
 	
-	@Test public void testGetPastListContactFutureAndPastMeetingsExist() {}
+	@Test
+	public void testGetPastListContactFutureMeetingsOnlyExist() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateYear);
+		
+		assertTrue(cm2Contacts.getPastMeetingList(c2).isEmpty());
+	}
 	
-	@Test public void testGetPastListContactListSortedChronologically() {}
+	@Test 
+	public void testGetPastListContactNoMeetingsExist() {
+		assertTrue(cm2Contacts.getPastMeetingList(c2).isEmpty());
+	}
+	
+	@Test 
+	public void testGetPastListContactMeetingsWithNoContactMatchExist() {
+		cm2Contacts.addNewPastMeeting(contacts1, pastDateDay, "Past meeting a day ago.");
+		
+		assertTrue(cm2Contacts.getPastMeetingList(c2).isEmpty());
+	}
+	
+	@Test 
+	public void testGetPastListContactMeetingsWithFirstContactMatched() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past meeting a day ago.");
+		
+		List<PastMeeting> rtn = cm2Contacts.getPastMeetingList(c1);
+		
+		assertEquals(1, rtn.size());
+		
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(pastDateDay, rtn.get(0).getDate());
+	}
+	
+	@Test 
+	public void testGetPastListContactMeetingsWithSecondContactMatched() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past meeting a day ago.");
+		
+		List<PastMeeting> rtn = cm2Contacts.getPastMeetingList(c2);
+		
+		assertEquals(1, rtn.size());
+		
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(pastDateDay, rtn.get(0).getDate());
+	}
+	
+	@Test 
+	public void testGetPastListContactListSortedChronologically() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Past meeting a day ago.");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "Past meeting a day ago.");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateYear, "Past meeting a day ago.");
+		
+		List<PastMeeting> rtn = cm2Contacts.getPastMeetingList(c2);
+	
+		assertEquals(3, rtn.size());
+		
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(pastDateYear, rtn.get(0).getDate());
+		
+		assertEquals(contacts2, rtn.get(1).getContacts());
+		assertEquals(pastDateMonth, rtn.get(1).getDate());
+		
+		assertEquals(contacts2, rtn.get(2).getContacts());
+		assertEquals(pastDateDay, rtn.get(2).getDate());
+	}
+	
+	@Test
+	public void testGetPastListContactFutureTurnsToPast()
+	{
+		cm2Contacts.addFutureMeeting(contacts1, futureDateMonth);
+		
+		Clock.setTime(new GregorianCalendar(2050,01,01));
+		
+		List<PastMeeting> rtn = cm2Contacts.getPastMeetingList(c1);
+		
+		assertEquals(1, rtn.size());
+		
+		assertEquals(contacts1, rtn.get(0).getContacts());
+		assertEquals(futureDateMonth, rtn.get(0).getDate());
+	}
+	
+	@Test
+	public void testGetPastListContactNoDuplicates()
+	{
+		fail("Need to determine what is meant as a duplicate");
+	}
 	
 	// Test addNewPastMeeting()
 	
