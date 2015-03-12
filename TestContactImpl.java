@@ -1,6 +1,8 @@
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -153,6 +155,49 @@ public class TestContactImpl {
 		assertEquals("Line 1. Line 2.", ct.getNotes());
 	}
 	
+	@Test
+	public void testEqualsAllSame()
+	{
+		Contact ct = new ContactImpl(65,"Bob","Line 1.");
+		Contact ct2 = new ContactImpl(65,"Bob","Line1.");
+		
+		assertTrue(ct2.equals(ct));
+	}
+	
+	@Test
+	public void testEqualsDifferentObject()
+	{
+		Contact ct = new ContactImpl(65,"Bob","Line 1.");
+
+		assertFalse(ct.equals("A string"));
+	}
+	
+	@Test
+	public void testEqualsNameDifferent()
+	{
+		Contact ct = new ContactImpl(65,"Bob","Line 1.");
+		Contact ct2 = new ContactImpl(65,"Bobs","Line1.");
+		
+		assertFalse(ct2.equals(ct));
+	}
+	
+	@Test
+	public void testEqualsIDDifferent()
+	{
+		Contact ct = new ContactImpl(65,"Bob","Line 1.");
+		Contact ct2 = new ContactImpl(66,"Bob","Line1.");
+		
+		assertFalse(ct2.equals(ct));
+	}
+	
+	@Test
+	public void testEqualsNotesDifferent()
+	{
+		Contact ct = new ContactImpl(65,"Bob","Line 1.");
+		Contact ct2 = new ContactImpl(65,"Bob","Line2.");
+		
+		assertFalse(ct2.equals(ct));
+	}
 
 
 }
