@@ -107,5 +107,11 @@ public class TestMeetingImpl {
 		
 		assertFalse(meeting2.equals(testMeeting));
 	}
+	
+	@Test
+	public void testEqualsDifferentObject()
+	{
+		assertFalse(testMeeting.equals("An object"));
+	}
 
 }
