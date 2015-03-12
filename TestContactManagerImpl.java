@@ -195,6 +195,8 @@ public class TestContactManagerImpl {
 	
 	// Test reading and altering file correctly
 	
+/*
+	
 	@Test 
 	public void testFileCreatedIfNotExist() 
 	{
@@ -1068,7 +1070,7 @@ public class TestContactManagerImpl {
 	public void testAddMeetingNotesFileUpdated() {
 		fail("To be determined if this is the right approach");
 	}
-	
+*/	
 	// Test addNewContact()
 	
 	@Test(expected=NullPointerException.class)
@@ -1149,6 +1151,11 @@ public class TestContactManagerImpl {
 		cm2Contacts.getContacts(3);
 	}
 	
+	@Test(expected=IllegalArgumentException.class) 
+	public void testGetContactsIntOneParameterNotExistZeroID() {
+		cm2Contacts.getContacts(0);
+	}
+	
 	@Test 
 	public void testGetContactsIntOneParameterSecond() {
 		Set<Contact> ct = cm2Contacts.getContacts(2);
@@ -1194,7 +1201,7 @@ public class TestContactManagerImpl {
 	}
 	
 	// Test getContacts(String)
-
+/*
 	@Test(expected=NullPointerException.class) 
 	public void testGetContactsStringNullParamterException() {
 		String nullString = null;
@@ -1314,7 +1321,7 @@ public class TestContactManagerImpl {
 	public void testFlushStoresMeetingChanges() {
 		fail("Scope for saving file not yet confirmed");
 	}
-	
+*/	
 	
 
 }
