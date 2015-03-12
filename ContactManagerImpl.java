@@ -30,9 +30,23 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public PastMeeting getPastMeeting(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		if (id < 0 || id > meetings.size()) return null;
+		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) <= 0) throw new IllegalArgumentException("Meeting is in the past");
+
+		PastMeeting rtn;
+		
+		try {
+			rtn = (PastMeeting)meetings.get(id - 1);
+		}
+		catch (ClassCastException e)
+		{
+			meetings.set(id - 1, new PastMeetingImpl(meetings.get(id - 1),""));
+			rtn = (PastMeeting)meetings.get(id - 1);
+		}
+		
+		return rtn;
 	}
+
 
 	@Override
 	public FutureMeeting getFutureMeeting(int id) {
@@ -87,8 +101,13 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public void addMeetingNotes(int id, String text) {
-		// TODO Auto-generated method stub
-
+		if (id <= 0 || id > meetings.size()) throw new IllegalArgumentException("Meeting doesn't exist.");
+		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) >=0) throw new IllegalStateException("Meeting set for time in future.");
+		if (text == null) throw new NullPointerException("Text is null.");
+		
+		//Need to find out what to do if notes already exist, for now, I'm overwriting them
+		
+		meetings.set(id - 1, new PastMeetingImpl(meetings.get(id - 1), text));
 	}
 
 	@Override
