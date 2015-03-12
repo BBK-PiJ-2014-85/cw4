@@ -174,11 +174,14 @@ public class TestContactManagerImpl {
 		contacts3.add(c2);
 		contacts3.add(c3);
 		
+		cm1Contacts = new ContactManagerImpl();
 		cm1Contacts.addNewContact("Bob","Nice guy");
 		
+		cm2Contacts = new ContactManagerImpl();
 		cm2Contacts.addNewContact("Bob","Nice guy");
 		cm2Contacts.addNewContact("Fred","Talks too much");
-		
+
+		cm3Contacts = new ContactManagerImpl();
 		cm3Contacts.addNewContact("Bob","Nice guy");
 		cm3Contacts.addNewContact("Fred","Talks too much");
 		cm3Contacts.addNewContact("Anon","");
