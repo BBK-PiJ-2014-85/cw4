@@ -34,8 +34,11 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public FutureMeeting getFutureMeeting(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		if (id < 0 || id > meetings.size()) return null;
+		
+		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) >= 0) throw new IllegalArgumentException("Meeting is in the past");
+		
+		return (FutureMeeting) meetings.get(id - 1);
 	}
 
 	@Override
