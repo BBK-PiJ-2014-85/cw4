@@ -121,7 +121,7 @@ public class TestPastMeetingImpl {
 		
 		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2,"Notes 2");
 		
-		assertTrue(meeting2.equals(meeting1));
+		assertFalse(meeting2.equals(meeting1));
 	}
 	
 	@Test
@@ -173,7 +173,7 @@ public class TestPastMeetingImpl {
 	}
 	
 	@Test
-	public void testConstructorMeeting()
+	public void testConstructorMeetingAndNotes()
 	{
 		Set<Contact> attendees2 = new HashSet<Contact>();
 		attendees2.add(new ContactImpl(1,"Bob","A bloke."));
@@ -182,9 +182,9 @@ public class TestPastMeetingImpl {
 		Calendar date2 = new GregorianCalendar(1985,03,13);
 		
 		Meeting meeting = new MeetingImpl(1,date2,attendees2);
-		PastMeeting past = new PastMeetingImpl(meeting);
-		
-		assertTrue(testMeeting.equals(past));
+		PastMeeting past = new PastMeetingImpl(1,date2,attendees,"Notes.");
+		PastMeeting past2 = new PastMeetingImpl(testMeeting, "Notes."); 
+		assertTrue(past2.equals(past));
 	}
 	
 	@Test
