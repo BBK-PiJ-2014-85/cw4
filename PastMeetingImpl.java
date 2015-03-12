@@ -1,37 +1,35 @@
 
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
 
-public class PastMeetingImpl implements PastMeeting {
+public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 
-	public PastMeetingImpl(Meeting currentMeeting) {}
+	String notes = "";
 	
-	public PastMeetingImpl(){}
-	
-	@Override
-	public int getId() {
-		// TODO Auto-generated method stub
-		return 0;
+	public PastMeetingImpl(Meeting currentMeeting) {
+		super(currentMeeting.getId(),currentMeeting.getDate(),currentMeeting.getContacts());
 	}
 
-	@Override
-	public Calendar getDate() {
-		// TODO Auto-generated method stub
-		return null;
+	public PastMeetingImpl(int id, Calendar date, Set<Contact> attendees) {
+		super(id, date, attendees);
+	}
+	
+	public PastMeetingImpl(int id, Calendar date, Set<Contact> attendees, String notes) {
+		super(id, date, attendees);
+		if (notes != null) this.notes = notes;
 	}
 
-	@Override
-	public Set<Contact> getContacts() {
-		// TODO Auto-generated method stub
-		return null;
+	public PastMeetingImpl(PastMeeting meeting, String notes) {
+		super(meeting.getId(), meeting.getDate(), meeting.getContacts());
+		if (notes != null) this.notes = notes;
 	}
 
 	@Override
 	public String getNotes() {
-		// TODO Auto-generated method stub
-		return null;
+		return notes;
 	}
 
 }
