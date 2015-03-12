@@ -587,7 +587,7 @@ public class TestContactManagerImpl {
 		assertEquals(contacts2, cm2Contacts.getMeeting(2).getContacts());
 		assertEquals(futureDateMonth, cm2Contacts.getMeeting(2).getDate());
 	}
-	
+	*/
 	// Test getFutureMeetingList(Contact)
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -595,7 +595,7 @@ public class TestContactManagerImpl {
 		cm2Contacts.getFutureMeetingList(c3);
 	}
 	
-	@Test 
+	@Test(expected=IllegalArgumentException.class)
 	public void testGetFutureListNoContactsExistException() {
 		cm.getFutureMeetingList(c3);
 	}
@@ -624,29 +624,31 @@ public class TestContactManagerImpl {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
 		
-		assertTrue(cm2Contacts.getFutureMeetingList(c3).isEmpty());
+		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c1);
+		
+		assertEquals(2,rtn.size());
+		assertEquals(futureDateDay, rtn.get(0).getDate());
+		assertEquals(contacts2, rtn.get(0).getContacts());
+		assertEquals(futureDateMonth, rtn.get(1).getDate());
+		assertEquals(contacts2, rtn.get(1).getContacts());
+		
 	}
 	
 	@Test 
 	public void testGetFutureListContactNoMeetingsExist() {
-		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
-		cm2Contacts.addFutureMeeting(contacts3, futureDateMonth);
+		cm3Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm3Contacts.addFutureMeeting(contacts1, futureDateMonth);
 		
-		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c2);
-		assertEquals(futureDateDay, rtn.get(0).getDate());
-		assertEquals(contacts2, rtn.get(0).getContacts());
-		assertEquals(futureDateMonth, rtn.get(1).getDate());
-		assertEquals(contacts3, rtn.get(1).getContacts());
-		assertEquals(2,rtn.size());
+		assertTrue(cm3Contacts.getFutureMeetingList(c3).isEmpty());
 	}
 	
 	@Test 
 	public void testGetFutureListContactFutureAndPastMeetingsExist() {
-		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
-		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "A past meeting");
-		cm2Contacts.addFutureMeeting(contacts3, futureDateMonth);
+		cm3Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm3Contacts.addNewPastMeeting(contacts2, pastDateMonth, "A past meeting");
+		cm3Contacts.addFutureMeeting(contacts3, futureDateMonth);
 		
-		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c2);
+		List<Meeting> rtn = cm3Contacts.getFutureMeetingList(c2);
 		assertEquals(futureDateDay, rtn.get(0).getDate());
 		assertEquals(contacts2, rtn.get(0).getContacts());
 		assertEquals(futureDateMonth, rtn.get(1).getDate());
@@ -656,16 +658,17 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testGetFutureListContactOnlyContactMatchedMeetingsReturned() {
-		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
-		cm2Contacts.addFutureMeeting(contacts3, futureDateMonth);
-		cm2Contacts.addFutureMeeting(contacts3, futureDateYear);
+		cm3Contacts.addFutureMeeting(contacts2, futureDateDay);
+		cm3Contacts.addFutureMeeting(contacts3, futureDateMonth);
+		cm3Contacts.addFutureMeeting(contacts3, futureDateYear);
 		
-		List<Meeting> rtn = cm2Contacts.getFutureMeetingList(c3);
+		List<Meeting> rtn = cm3Contacts.getFutureMeetingList(c3);
+		assertEquals(2,rtn.size());
 		assertEquals(futureDateMonth, rtn.get(0).getDate());
 		assertEquals(contacts3, rtn.get(0).getContacts());
 		assertEquals(futureDateYear, rtn.get(1).getDate());
 		assertEquals(contacts3, rtn.get(1).getContacts());
-		assertEquals(2,rtn.size());
+
 	}
 	
 	@Test 
@@ -705,7 +708,7 @@ public class TestContactManagerImpl {
 		assertEquals(futureDateMonth, rtn.get(0).getDate());
 		assertEquals(contacts2, rtn.get(0).getContacts());
 	}
-	
+	/*
 	// Test getFutureMeetingList(Calendar)
 	
 	@Test 
