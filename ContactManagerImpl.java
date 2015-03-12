@@ -1,4 +1,5 @@
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.Set;
 public class ContactManagerImpl implements ContactManager {
 	
 	int countContact = 1;
-	Map<Integer,Contact> contacts = new HashMap<Integer,Contact>();
+	List<Contact> contacts = new ArrayList<Contact>();
 	
 
 	@Override
@@ -74,7 +75,7 @@ public class ContactManagerImpl implements ContactManager {
 		
 		if (name==null || notes==null) throw new NullPointerException("Name or notes are null");
 		else {
-			contacts.put(countContact, new ContactImpl(countContact,name,notes));
+			contacts.add(new ContactImpl(countContact,name,notes));
 			countContact++;
 			}
 	}
@@ -84,10 +85,10 @@ public class ContactManagerImpl implements ContactManager {
 		
 		Set<Contact> rtn = new HashSet<Contact>();
 		
-		for (int i : ids)
+		for (int i : ids) 
 		{
-			if (contacts.containsKey(i)) rtn.add(contacts.get(i));
-			else throw new IllegalArgumentException("Contact ID does not exist");
+			if (i <= 0 || i > contacts.size()) throw new IllegalArgumentException("Contact ID does not exist");
+			else rtn.add(contacts.get(i - 1));
 		}
 		
 		return rtn;
@@ -95,8 +96,17 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public Set<Contact> getContacts(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if (name == null) throw new NullPointerException("Name string is null.");
+		
+		Set<Contact> rtn = new HashSet<Contact>();
+		
+		for (Contact c : contacts)
+		{
+			if (c.getName().contains(name)) rtn.add(c);
+		}
+		
+		return rtn;
 	}
 
 	@Override
