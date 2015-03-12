@@ -9,8 +9,9 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 
 	String notes = "";
 	
-	public PastMeetingImpl(Meeting currentMeeting) {
+	public PastMeetingImpl(Meeting currentMeeting, String notes) {
 		super(currentMeeting.getId(),currentMeeting.getDate(),currentMeeting.getContacts());
+		this.notes = notes;
 	}
 
 	public PastMeetingImpl(int id, Calendar date, Set<Contact> attendees) {
@@ -30,6 +31,28 @@ public class PastMeetingImpl extends MeetingImpl implements PastMeeting {
 	@Override
 	public String getNotes() {
 		return notes;
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		try{
+			if (((PastMeeting)other).getDate().equals(date) 
+					&& ((PastMeeting)other).getId() == id 
+					&& ((PastMeeting)other).getContacts().equals(attendees)
+					&& ((PastMeeting)other).getNotes().equals(notes)
+					) return true;
+		}
+		catch (ClassCastException e)
+		{
+			return false;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return date.hashCode() + attendees.hashCode() + notes.hashCode() + id;
 	}
 
 }
