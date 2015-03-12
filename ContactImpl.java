@@ -46,5 +46,24 @@ public class ContactImpl implements Contact {
 		}
 
 	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		try{
+			if (((Contact)other).getName().equals(name) && ((Contact)other).getId() == id 
+					&& ((Contact)other).getNotes().equals(notes)) return true;
+		}
+		catch (ClassCastException e)
+		{
+			return false;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode() + notes.hashCode() + id;
+	}
 
 }
