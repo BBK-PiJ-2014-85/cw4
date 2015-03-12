@@ -158,8 +158,8 @@ public class TestContactImpl {
 	@Test
 	public void testEqualsAllSame()
 	{
-		Contact ct = new ContactImpl(65,"Bob","Line 1.");
-		Contact ct2 = new ContactImpl(65,"Bob","Line1.");
+		Contact ct = new ContactImpl(65,"Bob","Notes");
+		Contact ct2 = new ContactImpl(65,"Bob","Notes");
 		
 		assertTrue(ct2.equals(ct));
 	}
