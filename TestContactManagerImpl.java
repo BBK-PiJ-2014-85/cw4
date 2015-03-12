@@ -483,7 +483,7 @@ public class TestContactManagerImpl {
 		cm2Contacts.addFutureMeeting(contacts2,futureDateSecond);
 		cm2Contacts.getPastMeeting(1);
 	}
-	/*
+	
 	// Test getFutureMeeting()
 	
 	@Test(expected=IllegalArgumentException.class)  
@@ -708,9 +708,9 @@ public class TestContactManagerImpl {
 		assertEquals(futureDateMonth, rtn.get(0).getDate());
 		assertEquals(contacts2, rtn.get(0).getContacts());
 	}
-	/*
-	// Test getFutureMeetingList(Calendar)
 	
+	// Test getFutureMeetingList(Calendar)
+	/*
 	@Test 
 	public void testGetFutureListDateNoMeetingsMatch() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
@@ -767,7 +767,7 @@ public class TestContactManagerImpl {
 	public void testGetFutureListDateRemoveDuplicateTime(){
 		fail("Need this clarified. What duplicates need to be removed? All the same or just on date?");
 	}
-	
+	*/
 	// Test getPastMeetingList(Contact)
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -788,7 +788,7 @@ public class TestContactManagerImpl {
 		assertEquals(pastDateMonth, rtn.get(0).getDate());
 		
 		assertEquals(contacts2, rtn.get(1).getContacts());
-		assertEquals(pastDateDay, rtn.get(0).getDate());
+		assertEquals(pastDateDay, rtn.get(1).getDate());
 	}
 	
 	@Test
@@ -909,7 +909,7 @@ public class TestContactManagerImpl {
 	{
 		fail("Need to determine what is meant as a duplicate");
 	}
-	*/
+	
 	// Test addNewPastMeeting()
 	
 	@Test(expected=NullPointerException.class)
@@ -1073,7 +1073,7 @@ public class TestContactManagerImpl {
 	public void testAddMeetingNotesFileUpdated() {
 		fail("To be determined if this is the right approach");
 	}
-*/	
+
 	// Test addNewContact()
 	
 	@Test(expected=NullPointerException.class)
