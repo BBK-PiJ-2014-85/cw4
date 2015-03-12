@@ -61,7 +61,8 @@ public class TestPastMeetingImpl {
 		assertEquals("",testMeeting.getNotes());
 	}
 	
-	@Test void testGetNotes()
+	@Test 
+	public void testGetNotes()
 	{
 		Calendar date = new GregorianCalendar(1985,03,13);
 		PastMeeting past = new PastMeetingImpl(1, date, attendees, "Some notes");
