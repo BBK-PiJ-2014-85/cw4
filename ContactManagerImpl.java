@@ -1,9 +1,11 @@
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 
@@ -49,8 +51,17 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) {
-		// TODO Auto-generated method stub
-		return null;
+		if (!contacts.contains(contact)) throw new IllegalArgumentException("Contact not known");
+		
+	    Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
+
+		List<Meeting> rtn = meetings.stream()
+					.filter(x -> Clock.getCurrent().compareTo(x.getDate()) >= 0)
+					.filter(x -> x.getContacts().contains(contact))
+					.sorted(chronological)
+					.collect(Collectors.toList());
+		
+		return rtn;
 	}
 
 	@Override
