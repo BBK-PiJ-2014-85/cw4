@@ -1098,18 +1098,18 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testAddNewContactValueFirst() {
-		cm.addNewContact(c3.getName(),c3.getNotes());
+		cm.addNewContact(c1.getName(),c1.getNotes());
 		Set<Contact> ct = cm.getContacts(1);
 		
 		assertEquals(1,ct.size());
 	    
-		assertTrue(ct.contains(c3));
+		assertTrue(ct.contains(c1));
 	}
 	
 	@Test 
 	public void testAddNewContactValueSecond() {
 		cm1Contacts.addNewContact(c2.getName(),c2.getNotes());
-		Set<Contact> ct = cm.getContacts(2);
+		Set<Contact> ct = cm1Contacts.getContacts(2);
 		
 		assertEquals(1,ct.size());
 	    
@@ -1194,10 +1194,10 @@ public class TestContactManagerImpl {
 		Set<Contact> ct = cm3Contacts.getContacts(1,4,3);
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
+	@Test
 	public void testGetContactsNoParameters()
 	{
-		cm3Contacts.getContacts();
+		fail("Currently unclear if no parameters should return empty set or exception");
 	}
 	
 	// Test getContacts(String)
