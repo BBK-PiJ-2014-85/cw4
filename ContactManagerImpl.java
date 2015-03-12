@@ -1,24 +1,29 @@
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 
 
 public class ContactManagerImpl implements ContactManager {
 	
-	int countContact = 1;
+	int countContact = 1, meetingCount = 1;
+	Clock clock = new Clock();
 	List<Contact> contacts = new ArrayList<Contact>();
+	List<Meeting> meetings = new ArrayList<Meeting>();
 	
 
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
-		// TODO Auto-generated method stub
-		return 0;
+		
+		if (Clock.getCurrent().compareTo(date) >=0 ) throw new IllegalArgumentException("Date is in the past");
+		if (!this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contact not found");
+		
+		meetings.add(new FutureMeetingImpl(meetingCount,date,contacts));
+		meetingCount++;
+		return meetingCount - 1;
 	}
 
 	@Override
