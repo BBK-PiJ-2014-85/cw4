@@ -202,6 +202,20 @@ public class TestPastMeetingImpl {
 	}
 	
 	@Test
+	public void testConstructorSeparateNotesNull() //This assume objects are the same if notes are set as null or not specified
+	{
+		Set<Contact> attendees2 = new HashSet<Contact>();
+		attendees2.add(new ContactImpl(1,"Bob","A bloke."));
+		attendees2.add(new ContactImpl(2,"Fred","Another bloke."));
+		
+		Calendar date2 = new GregorianCalendar(1985,03,13);
+		
+		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2,null);
+		
+		assertTrue(meeting2.equals(testMeeting));
+	}
+	
+	@Test
 	public void testConstructorPastMeetingAndNotes()
 	{
 		PastMeeting pm1 = new PastMeetingImpl(testMeeting, "Notes!");
@@ -213,6 +227,23 @@ public class TestPastMeetingImpl {
 		Calendar date2 = new GregorianCalendar(1985,03,13);
 		
 		PastMeeting pm2 = new PastMeetingImpl(1,date2,attendees2,"Notes!");
+		
+		assertTrue(pm2.equals(pm1));
+		
+	}
+	
+	@Test
+	public void testConstructorPastMeetingAndNotesNull() //Assume if notes set to null then should still be ""
+	{
+		PastMeeting pm1 = new PastMeetingImpl(testMeeting,null);
+		
+		Set<Contact> attendees2 = new HashSet<Contact>();
+		attendees2.add(new ContactImpl(1,"Bob","A bloke."));
+		attendees2.add(new ContactImpl(2,"Fred","Another bloke."));
+		
+		Calendar date2 = new GregorianCalendar(1985,03,13);
+		
+		PastMeeting pm2 = new PastMeetingImpl(1,date2,attendees2,"");
 		
 		assertTrue(pm2.equals(pm1));
 		
