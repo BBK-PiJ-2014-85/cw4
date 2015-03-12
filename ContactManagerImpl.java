@@ -1,4 +1,5 @@
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -79,8 +80,14 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public List<Meeting> getFutureMeetingList(Calendar date) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<Meeting> rtn = meetings.stream()
+				.filter(x -> x.getDate().get(Calendar.YEAR) == date.get(Calendar.YEAR))
+				.filter(x -> x.getDate().get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR))
+				.sorted(chronological)
+				.collect(Collectors.toList());
+		
+		return rtn;
 	}
 
 	@Override
