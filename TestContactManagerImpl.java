@@ -42,7 +42,7 @@ public class TestContactManagerImpl {
 	final Calendar pastDateMonth= new GregorianCalendar(2010,5,7,13,11,31);
 	final Calendar pastDateDay= new GregorianCalendar(2010,6,5,13,11,31);
 	final Calendar pastDateHour= new GregorianCalendar(2010,6,6,11,11,31);
-	final Calendar pastDateMinute= new GregorianCalendar(2010,6,6,12,11,31);
+	final Calendar pastDateMinute= new GregorianCalendar(2010,6,6,12,9,31);
 	final Calendar pastDateSecond= new GregorianCalendar(2010,6,6,12,10,29);
 	
 
