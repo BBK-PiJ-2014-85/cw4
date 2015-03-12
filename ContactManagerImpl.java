@@ -45,8 +45,8 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public Meeting getMeeting(int id) {
-		// TODO Auto-generated method stub
-		return null;
+		if (id <=0 || id> meetings.size()) return null;
+		return meetings.get(id - 1);
 	}
 
 	@Override
@@ -56,11 +56,10 @@ public class ContactManagerImpl implements ContactManager {
 	    Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
 
 		List<Meeting> rtn = meetings.stream()
-					.filter(x -> Clock.getCurrent().compareTo(x.getDate()) >= 0)
+					.filter(x -> Clock.getCurrent().compareTo(x.getDate()) <= 0)
 					.filter(x -> x.getContacts().contains(contact))
 					.sorted(chronological)
 					.collect(Collectors.toList());
-		
 		return rtn;
 	}
 
