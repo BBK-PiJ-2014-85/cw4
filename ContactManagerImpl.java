@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 public class ContactManagerImpl implements ContactManager {
 	
+    Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
+	
 	int countContact = 1, meetingCount = 1;
 	Clock clock = new Clock();
 	List<Contact> contacts = new ArrayList<Contact>();
@@ -67,8 +69,6 @@ public class ContactManagerImpl implements ContactManager {
 	public List<Meeting> getFutureMeetingList(Contact contact) {
 		if (!contacts.contains(contact)) throw new IllegalArgumentException("Contact not known");
 		
-	    Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
-
 		List<Meeting> rtn = meetings.stream()
 					.filter(x -> Clock.getCurrent().compareTo(x.getDate()) <= 0)
 					.filter(x -> x.getContacts().contains(contact))
@@ -85,8 +85,29 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public List<PastMeeting> getPastMeetingList(Contact contact) {
-		// TODO Auto-generated method stub
-		return null;
+		if (!contacts.contains(contact)) throw new IllegalArgumentException("Contact not known");
+		
+		List<Meeting> pm = meetings.stream()
+				.filter(x -> Clock.getCurrent().compareTo(x.getDate()) >= 0)
+				.filter(x -> x.getContacts().contains(contact))
+				.sorted(chronological)
+				.collect(Collectors.toList());
+	
+		List<PastMeeting> rtn = new ArrayList<PastMeeting>();
+		
+		for (Meeting m : pm)
+		{
+			try{
+				rtn.add((PastMeeting)m);
+			} catch (ClassCastException e)
+			{
+				int location = m.getId() - 1;
+				meetings.set(location, new PastMeetingImpl(m,""));
+				rtn.add((PastMeeting)meetings.get(location));
+			}	
+		}
+		
+		return rtn;
 	}
 
 	@Override
