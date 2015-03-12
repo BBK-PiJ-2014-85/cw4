@@ -110,6 +110,9 @@ public class TestContactManagerImpl {
 	 * TODO: Assume addMeetingNotes() NullPOinterException is only for those being input, not already null
 	 * TODO: Assume if adding notes to one which notes already exist, it overwrites?
 	 * TODO: Should getContacts(String ) be case sensitive?
+	 * TODO: Should empty string "" match everything or nothing?
+	 * TODO:Should getContacts() with no method return nothing (its a strring) or an exception?
+
 	 * 
 	 * TODO: ME: Test things dont get removed when getting
 	 * TODO: ME: Add an equals method to contact to make comparing easy 
@@ -1100,65 +1103,225 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
-	public void testAddNewContactValue() {
-
-		//will need to iterate through with iterator
+	public void testAddNewContactValueFirst() {
+		cm.addNewContact(c3.getName(),c3.getNotes());
+		Set<Contact> ct = cm.getContacts(1);
+		
+		assertEquals(1,ct.size());
+	    
+		assertTrue(ct.contains(c3));
+	}
+	
+	@Test 
+	public void testAddNewContactValueSecond() {
+		cm1Contacts.addNewContact(c2.getName(),c2.getNotes());
+		Set<Contact> ct = cm.getContacts(2);
+		
+		assertEquals(1,ct.size());
+	    
+		assertTrue(ct.contains(c2));
 	}
 	
 	@Test 
 	public void testAddNewContactValueWithQuotations() {
+		Contact quoted = new ContactImpl(2, "Shayne \"The Pain \" Name", "He's not the only one who doesn't like his nickname");
+		cm1Contacts.addNewContact(quoted.getName(),quoted.getNotes());
 		
+		Set<Contact> ct = cm1Contacts.getContacts(2);
+		assertEquals(1,ct.size());
+		assertTrue(ct.contains(quoted));
 	}
 	
 	@Test 
 	public void testAddNewContactFileUpdatedFirst() {
-		
+		fail("Unsure on current scope of updating");
 	}
 	
 	@Test 
 	public void testAddNewContactFileUpdatedSecond() {
-		
+		fail("Unsure on current scope of updating");
 	}
 	
 	// Test getContacts(int)
 	
-	@Test public void testGetContactsIntOneParameter() {}
+	@Test 
+	public void testGetContactsIntOneParameterFirst() {
+		Set<Contact> ct = cm2Contacts.getContacts(1);
+		
+		assertEquals(1,ct.size());
+		assertTrue(ct.contains(c1));
+	}
 	
-	@Test public void testGetContactsIntMultipleParametersFirstInListIncluded() {}
+	@Test(expected=IllegalArgumentException.class) 
+	public void testGetContactsIntOneParameterNotExist() {
+		cm2Contacts.getContacts(3);
+	}
 	
-	@Test public void testGetContactsFirstParameterNotExist() {}
+	@Test 
+	public void testGetContactsIntOneParameterSecond() {
+		Set<Contact> ct = cm2Contacts.getContacts(2);
+		
+		assertEquals(1,ct.size());
+		assertTrue(ct.contains(c2));
+	}
+
 	
-	@Test public void testGetContactsSecondParameterNotExist() {}
+	@Test 
+	public void testGetContactsIntMultipleParametersFirstInListIncluded() {
+		Set<Contact> ct = cm3Contacts.getContacts(1,2,3);
+		
+		assertEquals(3,ct.size());
+		assertTrue(ct.contains(c1));
+		assertTrue(ct.contains(c2));
+		assertTrue(ct.contains(c3));
+	}
 	
-	@Test public void testGetContactsContactListEmpty() {}
+	@Test 
+	public void testGetContactsIntMultipleParametersFirstInListNotIncluded() {
+		Set<Contact> ct = cm3Contacts.getContacts(2,3);
+		
+		assertEquals(2,ct.size());
+		assertTrue(ct.contains(c2));
+		assertTrue(ct.contains(c3));
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetContactsFirstParameterNotExist() {
+		Set<Contact> ct = cm3Contacts.getContacts(4,2,3);
+	}
+	
+	@Test(expected=IllegalArgumentException.class) 
+	public void testGetContactsSecondParameterNotExist() {
+		Set<Contact> ct = cm3Contacts.getContacts(1,4,3);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetContactsNoParameters()
+	{
+		cm3Contacts.getContacts();
+	}
 	
 	// Test getContacts(String)
 
-	@Test public void testGetContactsStringNullParamterException() {}
+	@Test(expected=NullPointerException.class) 
+	public void testGetContactsStringNullParamterException() {
+		String nullString = null;
+		cm3Contacts.getContacts(nullString);
+	}
 
-	@Test public void testGetContactsEmptyString() {}
+	@Test 
+	public void testGetContactsEmptyString() {
+		Set<Contact> ct = cm3Contacts.getContacts("");
+		
+		assertEquals(0,ct.size());
+	}
 	
-	@Test public void testGetContactsStringMatchFirstContact() {}
+	@Test 
+	public void testGetContactsStringMatchFirstContact() {
+		Set<Contact> ct = cm2Contacts.getContacts("ob");
+		
+		assertEquals(1,ct.size());
+		assertTrue(ct.contains(c1));
+	}
 	
-	@Test public void testGetContactsStringMatchSecondContact() {}
+	@Test 
+	public void testGetContactsStringMatchSecondContact() {
+		Set<Contact> ct = cm2Contacts.getContacts("re");
+		
+		assertEquals(1,ct.size());
+		assertTrue(ct.contains(c2));
+	}
 	
-	@Test public void testGetContactStringMatchMultipleIncludingFirst() {}
+	@Test 
+	public void testGetContactsStringLongerSoNoMatch() {
+		Set<Contact> ct = cm2Contacts.getContacts("Bobs");
+		
+		assertEquals(0,ct.size());
+	}
+	
+	@Test 
+	public void testGetContactStringMatchMultipleIncludingFirst() {
+		
+		Contact first = new ContactImpl(1,"Mrs White", "Had a candlestick");
+		Contact second = new ContactImpl(2,"Mr Brown", "Was not there");
+		Contact third = new ContactImpl(3,"Miss Scarlet", "Was in the drawing room");
+		Contact fourth = new ContactImpl(4,"Mr Plum", "Felt aggrevated by not being called by his proper title");
+		
+		cm.addNewContact(first.getName(), first.getNotes());
+		cm.addNewContact(second.getName(), second.getNotes());
+		cm.addNewContact(third.getName(), third.getNotes());
+		cm.addNewContact(fourth.getName(), fourth.getNotes());
+		
+		Set<Contact> ct = cm.getContacts("Mr");
+		
+		assertEquals(3,ct.size());
+		assertTrue(ct.contains(first));
+		assertTrue(ct.contains(second));
+		assertTrue(ct.contains(fourth));
+	}
+	
+	@Test 
+	public void testGetContactStringMatchMultipleNotIncludingFirst() {
+		Contact first = new ContactImpl(1,"Mrs White", "Had a candlestick");
+		Contact second = new ContactImpl(2,"Mr Brown", "Was not there");
+		Contact third = new ContactImpl(3,"Miss Scarlet", "Was in the drawing room");
+		Contact fourth = new ContactImpl(4,"Mr Plum", "Felt aggrevated by not being called by his proper title");
+		
+		cm.addNewContact(first.getName(), first.getNotes());
+		cm.addNewContact(second.getName(), second.getNotes());
+		cm.addNewContact(third.getName(), third.getNotes());
+		cm.addNewContact(fourth.getName(), fourth.getNotes());
+		
+		Set<Contact> ct = cm.getContacts("Mr ");
+		
+		assertEquals(2,ct.size());
+		assertTrue(ct.contains(second));
+		assertTrue(ct.contains(fourth));
+	}
 
-	@Test public void testGetContactNoMatch() {}
+	@Test 
+	public void testGetContactNoMatch() {
+		Set<Contact> ct = cm3Contacts.getContacts("Elizabeth");
+		
+		assertTrue(ct.isEmpty());
+	}
 	
-	@Test public void testGetContactListContactsEmpty() {}
+	@Test 
+	public void testGetContactListContactsEmpty() {
+		Set<Contact> ct = cm.getContacts("Elizabeth");
+		
+		assertTrue(ct.isEmpty());
+	}
 	
-	@Test public void testGetContactMatchWithinWord() {}
+	@Test 
+	public void testGetContactMatchWithinWord() {
+		Set<Contact> ct = cm2Contacts.getContacts("o");
+		
+		assertEquals(1,ct.size());
+		assertTrue(ct.contains(c1));
+	}
 	
-	@Test public void testGetContactDoesntMatchCase() {}
+	@Test 
+	public void testGetContactDoesntMatchCase() {
+		fail("Need to determine if this should be case sensitive or not");
+	}
 	
 	// Test flush()
 	
-	@Test public void testFlushRunsWhenProgramClosed() {}
+	@Test 
+	public void testFlushRunsWhenProgramClosed() {
+		fail("Scope for saving file not yet confirmed");
+	}
 	
-	@Test public void testFlushStoresContactsChanges() {}
+	@Test 
+	public void testFlushStoresContactsChanges() {
+		fail("Scope for saving file not yet confirmed");
+	}
 	
-	@Test public void testFlushStoresMeetingChanges() {}
+	@Test 
+	public void testFlushStoresMeetingChanges() {
+		fail("Scope for saving file not yet confirmed");
+	}
 	
 	
 
