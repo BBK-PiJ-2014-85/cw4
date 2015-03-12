@@ -101,9 +101,12 @@ public class ContactManagerImpl implements ContactManager {
 		
 		Set<Contact> rtn = new HashSet<Contact>();
 		
-		for (Contact c : contacts)
+		if (name != "")
 		{
-			if (c.getName().contains(name)) rtn.add(c);
+			for (Contact c : contacts)
+			{
+				if (c.getName().contains(name)) rtn.add(c);
+			}
 		}
 		
 		return rtn;
