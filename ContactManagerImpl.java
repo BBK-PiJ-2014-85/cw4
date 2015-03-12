@@ -1,10 +1,21 @@
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
 
 public class ContactManagerImpl implements ContactManager {
+	
+	int countContact = 0;
+	List<Contact> contacts = new ArrayList<Contact>();
+	
+	public static void main(String[] args)
+	{
+		ContactManagerImpl cm = new ContactManagerImpl();
+		cm.addNewContact("Bob","bloke");
+		
+	}
 	
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
@@ -63,7 +74,9 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public void addNewContact(String name, String notes) {
-		// TODO Auto-generated method stub
+		
+		if (name==null || notes==null) throw new NullPointerException("Name or notes are null");
+		else contacts.add(new ContactImpl(countContact++, name, notes));
 
 	}
 
