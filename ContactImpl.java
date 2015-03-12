@@ -1,6 +1,4 @@
-package impls;
 
-import interfaces.Contact;
 
 /**
  * Implementation of the Contact interface.

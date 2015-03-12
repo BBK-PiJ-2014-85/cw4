@@ -1,14 +1,8 @@
-package impls;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
-import interfaces.Contact;
-import interfaces.ContactManager;
-import interfaces.FutureMeeting;
-import interfaces.Meeting;
-import interfaces.PastMeeting;
 
 public class ContactManagerImpl implements ContactManager {
 	

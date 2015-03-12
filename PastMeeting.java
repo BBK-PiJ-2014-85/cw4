@@ -1,4 +1,4 @@
-package interfaces;
+
 
 /**
 * A meeting that was held in the past.

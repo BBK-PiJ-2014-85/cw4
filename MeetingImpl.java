@@ -1,10 +1,7 @@
-package impls;
 
 import java.util.Calendar;
 import java.util.Set;
 
-import interfaces.Contact;
-import interfaces.Meeting;
 
 /**
  * Implementation of the class Meeting.

@@ -1,7 +1,4 @@
-package tests;
 
-import interfaces.Contact;
-import impls.ContactImpl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 

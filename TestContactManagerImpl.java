@@ -1,20 +1,9 @@
-package tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import impls.Clock;
-import impls.ContactImpl;
-import impls.ContactManagerImpl;
-import impls.FutureMeetingImpl;
-import impls.MeetingImpl;
-import impls.PastMeetingImpl;
-import interfaces.Contact;
-import interfaces.ContactManager;
-import interfaces.Meeting;
-import interfaces.PastMeeting;
 
 import java.io.File;
 import java.io.IOException;

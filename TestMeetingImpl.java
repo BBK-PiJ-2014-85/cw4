@@ -1,10 +1,3 @@
-package tests;
-
-
-import impls.ContactImpl;
-import impls.MeetingImpl;
-import interfaces.Contact;
-import interfaces.Meeting;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
