@@ -1093,7 +1093,7 @@ public class TestContactManagerImpl {
 	@Test 
 	public void testAddNewContactSecondContactIDNum() {
 		cm1Contacts.addNewContact("Bob","Second");
-		cm.getContacts(2);
+		cm1Contacts.getContacts(2);
 	}
 	
 	@Test 
