@@ -188,8 +188,8 @@ public class TestContactManagerImpl {
 		
 		
 		m1 = new MeetingImpl(1,null,null); //TODO: Add proper meetings in here
-		m2 = new PastMeetingImpl(); //TODO: Add proper meetings in here
-		m3 = new PastMeetingImpl(); //TODO: Add proper meeting, without notes yet, in here
+	//	m2 = new PastMeetingImpl(); //TODO: Add proper meetings in here
+	//	m3 = new PastMeetingImpl(); //TODO: Add proper meeting, without notes yet, in here
 	//	m4 = new FutureMeetingImpl(); //TODO: Add proper meetings in here
 	}
 	
@@ -413,7 +413,7 @@ public class TestContactManagerImpl {
 		tempCM.addFutureMeeting(contacts2,futureDateMonth);
 		assertNotNull(tempCM.getFutureMeeting(2));
 	}
-/*	
+	
 	// Test getPastMeeting()
 	
 	@Test(expected=IllegalArgumentException.class) 
@@ -435,12 +435,12 @@ public class TestContactManagerImpl {
 		
 		Clock.setTime(new GregorianCalendar(2050,01,01));
 		
-		assertEquals(new PastMeetingImpl(new MeetingImpl(1,futureDateDay,contacts2)),cm2Contacts.getPastMeeting(1));
+		assertEquals(new PastMeetingImpl(new MeetingImpl(1,futureDateDay,contacts2),""),cm2Contacts.getPastMeeting(1));
 	}
 	
 	@Test 
 	public void testGetPastMeetingNotExist() {
-		cm2Contacts.addFutureMeeting(contacts2,pastDateDay);
+		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
 		assertNull(cm2Contacts.getPastMeeting(2));		
 	}
 	
@@ -483,7 +483,7 @@ public class TestContactManagerImpl {
 		cm2Contacts.addFutureMeeting(contacts2,futureDateSecond);
 		cm2Contacts.getPastMeeting(1);
 	}
-	
+	/*
 	// Test getFutureMeeting()
 	
 	@Test(expected=IllegalArgumentException.class)  
@@ -587,7 +587,7 @@ public class TestContactManagerImpl {
 		assertEquals(contacts2, cm2Contacts.getMeeting(2).getContacts());
 		assertEquals(futureDateMonth, cm2Contacts.getMeeting(2).getDate());
 	}
-	*/
+	
 	// Test getFutureMeetingList(Contact)
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -909,7 +909,7 @@ public class TestContactManagerImpl {
 	{
 		fail("Need to determine what is meant as a duplicate");
 	}
-	
+	*/
 	// Test addNewPastMeeting()
 	
 	@Test(expected=NullPointerException.class)
@@ -1005,7 +1005,7 @@ public class TestContactManagerImpl {
 	}
 	
 	// Test addMeetingNotes()
-	
+	/*
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddMeetingNotesMeetingNotExistException() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
