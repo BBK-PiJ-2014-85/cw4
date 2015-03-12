@@ -34,5 +34,25 @@ public class MeetingImpl implements Meeting {
 
 	@Override
 	public Set<Contact> getContacts() {return attendees;}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		try{
+			if (((Meeting)other).getDate().equals(date) 
+					&& ((Meeting)other).getId() == id 
+					&& ((Meeting)other).getContacts().equals(attendees)) return true;
+		}
+		catch (ClassCastException e)
+		{
+			return false;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return date.hashCode() + attendees.hashCode() + id;
+	}
 
 }
