@@ -1078,7 +1078,7 @@ public class TestContactManagerImpl {
 		cm2Contacts.addNewContact(null, "Little to say about him");
 	}
 	
-	@Test 
+	@Test(expected=NullPointerException.class) 
 	public void testAddNewContactNotesNullException() {
 		cm2Contacts.addNewContact("Bob", null);
 	}
