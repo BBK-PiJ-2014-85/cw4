@@ -190,7 +190,7 @@ public class TestContactManagerImpl {
 		m1 = new MeetingImpl(1,null,null); //TODO: Add proper meetings in here
 		m2 = new PastMeetingImpl(); //TODO: Add proper meetings in here
 		m3 = new PastMeetingImpl(); //TODO: Add proper meeting, without notes yet, in here
-		m4 = new FutureMeetingImpl(); //TODO: Add proper meetings in here
+	//	m4 = new FutureMeetingImpl(); //TODO: Add proper meetings in here
 	}
 	
 	// Test reading and altering file correctly
@@ -291,7 +291,7 @@ public class TestContactManagerImpl {
 	}
 	
 	// Test addFutureMeeting()
-	
+*/	
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddFutureMeetingPastDateExceptionYear() {
 		cm3Contacts.addFutureMeeting(contacts2,pastDateYear);
@@ -413,7 +413,7 @@ public class TestContactManagerImpl {
 		tempCM.addFutureMeeting(contacts2,futureDateMonth);
 		assertNotNull(tempCM.getFutureMeeting(2));
 	}
-	
+/*	
 	// Test getPastMeeting()
 	
 	@Test(expected=IllegalArgumentException.class) 
@@ -1201,7 +1201,7 @@ public class TestContactManagerImpl {
 	}
 	
 	// Test getContacts(String)
-/*
+
 	@Test(expected=NullPointerException.class) 
 	public void testGetContactsStringNullParamterException() {
 		String nullString = null;
@@ -1304,7 +1304,7 @@ public class TestContactManagerImpl {
 	public void testGetContactDoesntMatchCase() {
 		fail("Need to determine if this should be case sensitive or not");
 	}
-	
+/*	
 	// Test flush()
 	
 	@Test 
