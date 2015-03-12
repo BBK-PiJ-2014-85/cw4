@@ -1,22 +1,19 @@
 
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
 
 
 public class ContactManagerImpl implements ContactManager {
 	
-	int countContact = 0;
-	List<Contact> contacts = new ArrayList<Contact>();
+	int countContact = 1;
+	Map<Integer,Contact> contacts = new HashMap<Integer,Contact>();
 	
-	public static void main(String[] args)
-	{
-		ContactManagerImpl cm = new ContactManagerImpl();
-		cm.addNewContact("Bob","bloke");
-		
-	}
-	
+
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		// TODO Auto-generated method stub
@@ -76,14 +73,24 @@ public class ContactManagerImpl implements ContactManager {
 	public void addNewContact(String name, String notes) {
 		
 		if (name==null || notes==null) throw new NullPointerException("Name or notes are null");
-		else contacts.add(new ContactImpl(countContact++, name, notes));
-
+		else {
+			contacts.put(countContact, new ContactImpl(countContact,name,notes));
+			countContact++;
+			}
 	}
 
 	@Override
 	public Set<Contact> getContacts(int... ids) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Set<Contact> rtn = new HashSet<Contact>();
+		
+		for (int i : ids)
+		{
+			if (contacts.containsKey(i)) rtn.add(contacts.get(i));
+			else throw new IllegalArgumentException("Contact ID does not exist");
+		}
+		
+		return rtn;
 	}
 
 	@Override
