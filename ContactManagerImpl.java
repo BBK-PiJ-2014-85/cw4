@@ -120,8 +120,9 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date,String text) {
 		
+		//Assumed that past meetings can be added in the future, as in the spec this does not throw exceptions for date being in future
+		
 		if (contacts == null || date == null || text == null) throw new NullPointerException("A parameter is null");
-		if (Clock.getCurrent().compareTo(date) <=0) throw new IllegalArgumentException("Date is in the future.");
 		if (contacts.isEmpty() || !this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contacts either empty or at least one doesn't exist");
 		meetings.add(new PastMeetingImpl(meetingCount, date, contacts, text));
 		meetingCount++;
@@ -133,8 +134,7 @@ public class ContactManagerImpl implements ContactManager {
 		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) >=0) throw new IllegalStateException("Meeting set for time in future.");
 		if (text == null) throw new NullPointerException("Text is null.");
 		
-		//Need to find out what to do if notes already exist, for now, I'm overwriting them
-		
+		//Assumed as not specified that setting notes for a meeting with already notes will overwrite these
 		meetings.set(id - 1, new PastMeetingImpl(meetings.get(id - 1), text));
 	}
 
@@ -153,6 +153,9 @@ public class ContactManagerImpl implements ContactManager {
 		
 		Set<Contact> rtn = new HashSet<Contact>();
 		
+		//Assumed that entering no integers should return empty list as there is no id not to match
+		if (ids.length == 0) return rtn;
+		
 		for (int i : ids) 
 		{
 			if (i <= 0 || i > contacts.size()) throw new IllegalArgumentException("Contact ID does not exist");
@@ -169,10 +172,11 @@ public class ContactManagerImpl implements ContactManager {
 		
 		Set<Contact> rtn = new HashSet<Contact>();
 		
-		if (name != "")
+		if (name != "") //Assumed that searching for "" should match nothing not everything, as not mentioned in spec.
 		{
 			for (Contact c : contacts)
 			{
+				// Assumed that name search is case sensitive as not specified
 				if (c.getName().contains(name)) rtn.add(c);
 			}
 		}
