@@ -84,47 +84,28 @@ public class TestContactManagerImpl {
 	ContactManager cm, cm3Contacts, cm2Contacts, cm1Contacts;
 	
 	/*
-	 * TODO: What if the meeting is set on the same day, do we signify time as well?
+
 	 * TODO: getContactsInt, what if no input?
-	 * TODO: should getContacts(String) match be case sensitive?
 	 * TODO: Should meetings be autoupdated when they become past?
 	 * TODO: how do we do something on program close? Will need to test this in several places, for now, just have a flush
 	 * 			after every method that can run?
-	 * TODO: Can we assume that multiple cannot be run at the same time?
-	 * TODO: Do Meetings automatically convert into a past meeting dependent on date? It looks like it may only be done when notes are added. 
-	 * 			- For example, List<PastMeeting> getPastMeeting only to return those with notes added? (And not those added in future but now past)
 	 * TODO: What does meeting not contain duplicates mean for getFutureMeetingList. Which one to keep if different contacts? 
-	 * TODO: Which was is chronological order?
-	 * TODO: Assumed addNewPastMeeting() returns exception if the date is actually in the future
-	 * TODO: Assume addMeetingNotes() NullPOinterException is only for those being input, not already null
-	 * TODO: Assume if adding notes to one which notes already exist, it overwrites?
-	 * TODO: Should getContacts(String ) be case sensitive?
-	 * TODO: Should empty string "" match everything or nothing?
-	 * TODO:Should getContacts() with no method return nothing (its a strring) or an exception?
+	 * TODO: Need to ask: If add past meeting in future, will this then show on future or past searches? Similar if searching for past or future
+		
 
-	 * 
 	 * TODO: ME: Test things dont get removed when getting
-	 * TODO: ME: Add an equals method to contact to make comparing easy 
-	 * TODO: Test meeting swiched to past meeting where expected
-	 * TODO: Can test things ticking over from future to past by checking system time after, failing the test should it not be able to be completed in time (after trying several times)
-	 * TODO: Measure chronologically within seconds
-	 * TODO: TEst updated with each method that can be run and change
 	 * TODO: Test files after all excpetions
-	 * TODO: Times to test, 11 months,27 days - for year, +1 year - 1 second
-	 * 				- for month - 
-	 * TODO: Create own clock to use, and a test file checking that clock works properly, also testing that, without settings
-	 * 			it uses a proper date (put in a past and future meeting and check it sees it as such)
-	 * TODO: ME: getFutureMeeting test cases when have pastmeeting between two futures to ensure it checks on
-	 * TODO: ME: An equals statement within classes would let the comaprisons be much easier
-	 * TODO ME: Make sure null notes are ok from future meeting
-	 * TODO: ME: create a contact manager with 2 future meetings, 2 past meetings etc.
+	 * 
+	 * TODO: WHAT ABOUT NULLs?
+	 * TODO: Can just use equals not I've defined these
+	 * TODO: Remove the return illegal argument if in the future
+	 * TODO: find a way to store, and make sure rights ID's are read in.
+	 * TODO: CHANGE IT FROM UPDATING TO PAST MEETINGS, only one method does this, jsut cast it
+	 * TODO: what does duplicate mean and how can they happen? Multiuple matches by contact? Take this literally on compare and add tests for these
 	 * 
 	 * 
 	 * 
-	 * Things to test:
-	 * 
-	 * does the set compare properly for contacts to keep unique?
-	 * 
+
 	 */
 	
 	//Test reading and writing file
@@ -946,9 +927,9 @@ public class TestContactManagerImpl {
 		cm1Contacts.addNewPastMeeting(noone, pastDateMonth, "If noone was there, did it happen?");
 	}
 	
-	@Test(expected=IllegalArgumentException.class) 
+	@Test 
 	public void testAddPastMeetingDateInFuture() {
-		cm2Contacts.addNewPastMeeting(contacts1, futureDateMonth, "Future meeting should return exception?");
+		fail("Need clarificaion on what to do with these");
 	}
 	
 	
