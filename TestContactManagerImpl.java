@@ -102,7 +102,7 @@ public class TestContactManagerImpl {
 	 * TODO: find a way to store, and make sure rights ID's are read in.
 	 * TODO: CHANGE IT FROM UPDATING TO PAST MEETINGS, only one method does this, jsut cast it
 	 * TODO: what does duplicate mean and how can they happen? Multiuple matches by contact? Take this literally on compare and add tests for these
-	 * 
+	 * TODO: make sure empty and null are dealt with in every case
 	 * 
 	 * 
 
@@ -319,6 +319,12 @@ public class TestContactManagerImpl {
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddFutureMeetingUnknownContactNotFirstInListException() {
 		cm2Contacts.addFutureMeeting(contacts3,futureDateYear);
+	}
+	
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddFutureMeetingEmptyContactsListException() {
+		Set<Contact> empty = new HashSet<Contact>();
+		cm2Contacts.addFutureMeeting(empty,futureDateYear);
 	}
 	
 	@Test 
