@@ -1198,11 +1198,10 @@ public class TestContactManagerImpl {
 		cm3Contacts.getContacts(nullString);
 	}
 
-	@Test 
+	@Test(expected=NullPointerException.class)
 	public void testGetContactsEmptyString() {
+	//Stated in forum to treat this same as null
 		Set<Contact> ct = cm3Contacts.getContacts("");
-		
-		assertEquals(0,ct.size());
 	}
 	
 	@Test 
