@@ -42,8 +42,11 @@ import java.util.stream.Collectors;
 
 public class ContactManagerImpl implements ContactManager {
 	
-    Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
+	private final File CONTACTS_FILE;
 	
+    Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
+    
+    
 	int countContact = 1, countMeeting = 1;
 	Clock clock = new Clock();
 	List<Contact> contacts = new ArrayList<Contact>();
@@ -51,6 +54,13 @@ public class ContactManagerImpl implements ContactManager {
 	
 	public ContactManagerImpl()
 	{
+		CONTACTS_FILE = new File("Contact.txt");
+		launch();
+	}
+	
+	public ContactManagerImpl(String fileLocation)
+	{
+		CONTACTS_FILE= new File (fileLocation); 
 		launch();
 	}
 	
@@ -332,11 +342,11 @@ public class ContactManagerImpl implements ContactManager {
 	
 	private void launch()
 	{
-		File file = new File("Contact.txt");
+
 		
-		if (!file.exists())
+		if (!CONTACTS_FILE.exists())
 			try {
-				file.createNewFile();
+				CONTACTS_FILE.createNewFile();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
