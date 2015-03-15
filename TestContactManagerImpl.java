@@ -48,13 +48,16 @@ public class TestContactManagerImpl {
 
 	
 	final File contactFile = new File("Contact.txt");
+	final File cm1File = new File("cm1.txt");
+	final File cm2File = new File("cm2.txt");
+	final File cm3File = new File("cm3.txt");
 	
 	/* 
 	 * testContactsFile.txt contains no meetings and two contacts:
 	 * 	1) id=1 name="Bob" notes="Nice guy"
 	 * 	2) id=2 name="Fred" notes="Talks too much"
 	 */
-	final File testContactsFile = new File("tests/testContactsFile.txt");
+	final File testContactsFile = new File("testContactsFile.txt");
 	
 	/*
 	 * testMeetingsFile.txt contains two contacts and two meetings:
@@ -140,7 +143,10 @@ public class TestContactManagerImpl {
 	{
 		Clock.setTime(currentDate);
 		
-		if (contactFile.exists()) contactFile.delete(); 
+		if (contactFile.exists()) contactFile.delete();
+		if (cm1File.exists()) contactFile.delete();
+		if (cm2File.exists()) contactFile.delete();
+		if (cm3File.exists()) contactFile.delete();
 		cm = new ContactManagerImpl();
 		
 		c1 = new ContactImpl(1,"Bob","Nice guy");
@@ -159,14 +165,14 @@ public class TestContactManagerImpl {
 		contacts3.add(c2);
 		contacts3.add(c3);
 		
-		cm1Contacts = new ContactManagerImpl();
+		cm1Contacts = new ContactManagerImpl("cm1.txt");
 		cm1Contacts.addNewContact("Bob","Nice guy");
 		
-		cm2Contacts = new ContactManagerImpl();
+		cm2Contacts = new ContactManagerImpl("cm2.txt");
 		cm2Contacts.addNewContact("Bob","Nice guy");
 		cm2Contacts.addNewContact("Fred","Talks too much");
 
-		cm3Contacts = new ContactManagerImpl();
+		cm3Contacts = new ContactManagerImpl("cm3.txt");
 		cm3Contacts.addNewContact("Bob","Nice guy");
 		cm3Contacts.addNewContact("Fred","Talks too much");
 		cm3Contacts.addNewContact("Anon","");
@@ -191,6 +197,7 @@ public class TestContactManagerImpl {
 	@Test 
 	public void testFileContactsReadCorrectly() 
 	{
+		
 		copyFile(testContactsFile,contactFile);
 		
 		cm = new ContactManagerImpl();
