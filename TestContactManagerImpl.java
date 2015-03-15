@@ -193,12 +193,16 @@ public class TestContactManagerImpl {
 	{
 		assertTrue(contactFile.exists());
 	}
-/*	
+
 	@Test 
-	public void testFileContactsReadCorrectly() 
+	public void testFileContactsReadCorrectlyEmptyContructor() 
 	{
-		
-		copyFile(testContactsFile,contactFile);
+		ContactManager cm3TestContacts = new ContactManagerImpl("Contact.txt");
+		cm3TestContacts.addNewContact("Bob","Nice guy");
+		cm3TestContacts.addNewContact("Fred","Talks too much");
+		cm3TestContacts.addNewContact("Anon","");
+		cm3TestContacts.flush();
+		cm3TestContacts = null;
 		
 		cm = new ContactManagerImpl();
 		
@@ -208,6 +212,23 @@ public class TestContactManagerImpl {
 		
 	}
 	
+	@Test 
+	public void testFileContactsReadCorrectlyStringContructor() 
+	{
+		ContactManager cm3TestContacts = new ContactManagerImpl("Contact.txt");
+		cm3TestContacts.addNewContact("Bob","Nice guy");
+		cm3TestContacts.addNewContact("Fred","Talks too much");
+		cm3TestContacts.addNewContact("Anon","");
+		cm3TestContacts.flush();
+		cm3TestContacts = null;
+		
+		cm = new ContactManagerImpl("Contact.txt");
+		
+		assertEquals(c1,getOnlyContactFromSet(cm.getContacts(1)));
+		assertEquals(c2,getOnlyContactFromSet(cm.getContacts(2)));
+		assertEquals(c3,getOnlyContactFromSet(cm.getContacts(3)));
+	}
+/*	
 	@Test 
 	public void testFileContactsReadCorrectlyWithMeetings() 
 	{
