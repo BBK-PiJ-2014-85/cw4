@@ -1,14 +1,44 @@
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+//Spec make no mention of being used alongside similar implementations. There is no way of
+// adding a contact as a contact, or specufying the id via the contact manager, which supports that
+// a contact can only exist on one contact manager
 
+
+/* It was suggested on the forums that Contact and Meeting should contian the IDs as we ahouldnt assume
+ * relationship between our classes. However, there is no way of managing ID within contact using the given
+ * ,methods. For example, no exceptions are thrown from Contact, yet we need to define IDs in a constructor
+ * which must be public, to be able to reuse them. Given this notice was also released very late on,
+ * I've continued with the assumption that it is the contactManager which manages IDs.
+ * 
+ * Example, you cannot have a method to create iD's, and have this loaded in via a file for repeatblity,
+ * without having a method to define a specific ID. However, with no exceptions being thrown in the interface,
+ * it would be impossible to manage.
+ * 
+ * Without exceptions, and having ID directly definable via a contructor, it is impoosible to maintin
+ * to the spec uniqueness. I have therefore continued to use contact manager to manage the uniqueness.
+ * 
+ * The ID method chosen has been designed therefore to allow direct access is using an array. As contacts
+ * cannot be deleted from a contact manager, for quick reference the location in the list is used as the ID.
+ * 
+ * 
+
+
+
+
+*/
 
 public class ContactManagerImpl implements ContactManager {
 	
@@ -19,7 +49,11 @@ public class ContactManagerImpl implements ContactManager {
 	List<Contact> contacts = new ArrayList<Contact>();
 	List<Meeting> meetings = new ArrayList<Meeting>();
 	
-
+	public ContactManagerImpl()
+	{
+		launch();
+	}
+	
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		
@@ -33,6 +67,27 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public PastMeeting getPastMeeting(int id) {
+		
+		/*I assume here that getting a PAST MEETING is referenced by time rather than class, as
+			it specifies the exception if the meeting exists but is happening in the future, not 
+			a FutureMeeting.
+			
+			It is also clear in the spec that PastMeetings may not have notes, which is only possible
+			if they turn from a future to a PastMeeting via something other than the addNotes.
+			
+			Should a meeting therefore exist in the past and have been requested, it will be converted
+			to a past meeting with no notes, and then returned.
+		*/
+		
+/*		Optional<Meeting> rtnItemOpt =  
+				meetings.stream()
+						.filter(x -> x.getId() == id)
+						.findFirst()
+						;
+		
+		if (!rtnItemOpt.isPresent()) return null;
+		else if (Clock.getCurrent().compareTo(rtnItemOpt.getDate()) <= 0) throw new IllegalArgumentException("Meeting is in the past")
+	*/	
 		if (id < 0 || id > meetings.size()) return null;
 		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) <= 0) throw new IllegalArgumentException("Meeting is in the past");
 
@@ -274,10 +329,19 @@ public class ContactManagerImpl implements ContactManager {
 			
 		return stringClassBegin + stringId + stringCtId + stringDate + stringNotes + stringClassEnd;
 	}
-
+	
 	private void launch()
 	{
-		//Check if file exists() - if not, create it, otherwise, read from it.
+		File file = new File("Contact.txt");
+		
+		if (!file.exists())
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		
+		
 		
 		
 	}
@@ -285,6 +349,8 @@ public class ContactManagerImpl implements ContactManager {
 	private void readFile()
 	{
 	
+		
+		//set global values
 	}
 	
 	public boolean readLine(String line)
@@ -294,11 +360,28 @@ public class ContactManagerImpl implements ContactManager {
 		{
 			String nameTag = getStringByTag(line,"NameTag");
 			String notesTag = getStringByTag(line,"NotesTag");
-			
-			
+
+			contacts.add(new ContactImpl(getIntsByTag(line,"ID")[0],getStringByTag(line,nameTag),getStringByTag(line,notesTag)));
 		}
-		else if (getTagWithinArrows(line,0).equals("PastMeeting")) {/*read in pastMeeting*/}
-		else if (getTagWithinArrows(line,0).equals("FutureMeeting")) {/*read in pastMeeting*/}		
+		else if (getTagWithinArrows(line,0).equals("PastMeeting")) 
+		{
+			int id = getIntsByTag(line,"ID")[0];
+			
+			Set<Contact> cts = new HashSet<Contact>();
+			int[] ctIds = getIntsByTag(line,"Contacts");
+			for (int i = 1; i < ctIds.length; i++) cts.add(contacts.get(ctIds[i]-1));
+			
+			int[] dArr = getIntsByTag(line,"Date");
+			Calendar date = new GregorianCalendar(dArr[0],dArr[1],dArr[2],dArr[3],dArr[4],dArr[5]);
+			
+			if (getTagWithinArrows(line,0).equals("PastMeeting"))
+			{
+				String notes = getStringByTag(line,getStringByTag(line,"NoteTag"));
+				meetings.add(new PastMeetingImpl(id,date,cts,notes));
+			} else{
+				meetings.add(new FutureMeetingImpl(id,date,cts));
+			}
+		}
 		
 		return false;
 	}
