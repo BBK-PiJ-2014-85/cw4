@@ -190,7 +190,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	}
 
-	private String createFile()
+	public String createFile()
 	{
 		String output = "";
 		
@@ -272,10 +272,35 @@ public class ContactManagerImpl implements ContactManager {
 		return stringClassBegin + stringId + stringCtId + stringDate + stringNotes + stringClassEnd;
 	}
 
-	
-	private void readFile()
+	private void launch()
 	{
+		//Check if file exists() - if not, create it, otherwise, read from it.
+		
 		
 	}
 	
+	private void readFile()
+	{
+	
+	}
+	
+	public boolean readLine(String line)
+	{
+		if (line.equals("<end>")) return true;
+		else if (getWordBetweenArrows(line,0).equals("Contact")) {/*read in contact*/}
+		else if (getWordBetweenArrows(line,0).equals("PastMeeting")) {/*read in pastMeeting*/}
+		else if (getWordBetweenArrows(line,0).equals("FutureMeeting")) {/*read in pastMeeting*/}		
+		}
+		}
+		
+		
+		return false;
+	}
+	
+	private String getWordBetweenArrows(String line, int startLocation)
+	{
+		int wordLength = 0;
+		while (line.charAt(startLocation + 1 + wordLength) != '>') wordLength++;
+		return line.substring(startLocation+1, startLocation+1+wordLength);
+	}
 }
