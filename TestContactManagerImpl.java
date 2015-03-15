@@ -103,8 +103,12 @@ public class TestContactManagerImpl {
 	 * TODO: CHANGE IT FROM UPDATING TO PAST MEETINGS, only one method does this, jsut cast it
 	 * TODO: what does duplicate mean and how can they happen? Multiuple matches by contact? Take this literally on compare and add tests for these
 	 * TODO: make sure empty and null are dealt with in every case
+	 * TODO: test dates equal properly as need to round in serialisation. what of milli gets rounded?
+	 * TODO: Test meeting chaing to past, with "" notes, when serialised
+	 * TODO: Test the notes1 notes2 etc works.
 	 * 
-	 * 
+	 * TODO: Write excpetions for file reading, including id's not right
+	 * TODO: Fix sloppy list to id assumption
 
 	 */
 	
@@ -176,14 +180,14 @@ public class TestContactManagerImpl {
 	
 	// Test reading and altering file correctly
 	
-/*
+
 	
 	@Test 
 	public void testFileCreatedIfNotExist() 
 	{
 		assertTrue(contactFile.exists());
 	}
-	
+/*	
 	@Test 
 	public void testFileContactsReadCorrectly() 
 	{
