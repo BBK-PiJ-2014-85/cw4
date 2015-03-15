@@ -209,7 +209,7 @@ public class ContactManagerImpl implements ContactManager {
 		
 		//these could be a lot prettier with lambdas
 		int nameIterator = 1;
-		while (c.getName().contains(notInName))
+		while (c.getName().contains(notInName) || c.getNotes().contains(notInName))
 		{
 			notInName = "Name" + nameIterator;
 			nameIterator++;
@@ -218,16 +218,19 @@ public class ContactManagerImpl implements ContactManager {
 		String notInNotes = "Notes";
 		
 		int notesIterator = 1;
-		while (c.getName().contains(notInNotes))
+		while (c.getName().contains(notInNotes) || c.getNotes().contains(notInNotes))
 		{
 			notInNotes = "Notes" + notesIterator;
 			notesIterator++;
 		}
 		
-		String output = "<Contact>" + c.getId();
-		output += "<" + notInName + ">" + c.getName() + "<\\" + notInName + ">";
-		output += "<" + notInNotes + ">" + c.getNotes() + "<\\" + notInNotes + ">";
-		output += "<\\Contact>";
+		String output = "<Contact>" 
+						+ "<NameTag>" + notInName + "<\\NameTag>" 
+						+ "<NotesTag>" + notInNotes + "<\\NotesTag>" 
+						+ "<ID>" + c.getId() + "<\\ID>"
+						+ "<" + notInName + ">" + c.getName() + "<\\" + notInName + ">"
+						+ "<" + notInNotes + ">" + c.getNotes() + "<\\" + notInNotes + ">"
+						+ "<\\Contact>";
 		
 		return output;
 	}
@@ -260,7 +263,7 @@ public class ContactManagerImpl implements ContactManager {
 			}
 			
 			stringNotes = "<" + notInNotes + ">" + ((PastMeeting)m).getNotes() + "<\\" + notInNotes + ">";
-			stringClassBegin = "<PastMeeting>";
+			stringClassBegin = "<PastMeeting><NoteTag>" + notInNotes + "<\\NoteTag>";
 			stringClassEnd = "<\\PastMeeting>";
 		} catch (ClassCastException e)
 		{
@@ -287,17 +290,56 @@ public class ContactManagerImpl implements ContactManager {
 	public boolean readLine(String line)
 	{
 		if (line.equals("<end>")) return true;
-		else if (getWordBetweenArrows(line,0).equals("Contact")) {/*read in contact*/}
-		else if (getWordBetweenArrows(line,0).equals("PastMeeting")) {/*read in pastMeeting*/}
-		else if (getWordBetweenArrows(line,0).equals("FutureMeeting")) {/*read in pastMeeting*/}		
+		else if (getTagWithinArrows(line,0).equals("Contact")) 
+		{
+			String nameTag = getStringByTag(line,"NameTag");
+			String notesTag = getStringByTag(line,"NotesTag");
+			
+			
 		}
-		}
-		
+		else if (getTagWithinArrows(line,0).equals("PastMeeting")) {/*read in pastMeeting*/}
+		else if (getTagWithinArrows(line,0).equals("FutureMeeting")) {/*read in pastMeeting*/}		
 		
 		return false;
 	}
 	
-	private String getWordBetweenArrows(String line, int startLocation)
+	public String getStringByTag(String line, String tag)
+	{
+		int firstLoc = line.indexOf("<" + tag + ">") + 2 + tag.length();
+		int lastLoc = line.indexOf("<\\" + tag + ">");
+		
+		return line.substring(firstLoc, lastLoc);
+	}
+	
+	public int[] getIntsByTag(String line, String tag)
+	{
+		String numList = getStringByTag(line, tag);
+
+		int numCount = 1;
+		for (int i=0; i< numList.length(); i++) if (numList.charAt(i) == ',') numCount++; 
+		int[] rtn = new int[numCount];
+		
+		String numString = "";
+		int added=0;
+		for (int i = 0 ; i< numList.length() ; i++)
+		{
+			if ( Character.isDigit(numList.charAt(i))) 
+				{
+				numString += numList.charAt(i);
+				if (i == numList.length() - 1) rtn[added] = Integer.parseInt(numString);
+				}
+			else 
+			{
+				rtn[added] = Integer.parseInt(numString);
+				added++;
+				numString = "";
+			}
+		}
+		
+		return rtn;
+	}
+	
+	private String getTagWithinArrows(String line, int startLocation)
 	{
 		int wordLength = 0;
 		while (line.charAt(startLocation + 1 + wordLength) != '>') wordLength++;
