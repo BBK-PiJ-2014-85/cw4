@@ -14,7 +14,7 @@ public class ContactManagerImpl implements ContactManager {
 	
     Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
 	
-	int countContact = 1, meetingCount = 1;
+	int countContact = 1, countMeeting = 1;
 	Clock clock = new Clock();
 	List<Contact> contacts = new ArrayList<Contact>();
 	List<Meeting> meetings = new ArrayList<Meeting>();
@@ -26,9 +26,9 @@ public class ContactManagerImpl implements ContactManager {
 		if (Clock.getCurrent().compareTo(date) >=0 ) throw new IllegalArgumentException("Date is in the past");
 		if (!this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contact not found");
 		
-		meetings.add(new FutureMeetingImpl(meetingCount,date,contacts));
-		meetingCount++;
-		return meetingCount - 1;
+		meetings.add(new FutureMeetingImpl(countMeeting,date,contacts));
+		countMeeting++;
+		return countMeeting - 1;
 	}
 
 	@Override
@@ -124,8 +124,8 @@ public class ContactManagerImpl implements ContactManager {
 		
 		if (contacts == null || date == null || text == null) throw new NullPointerException("A parameter is null");
 		if (contacts.isEmpty() || !this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contacts either empty or at least one doesn't exist");
-		meetings.add(new PastMeetingImpl(meetingCount, date, contacts, text));
-		meetingCount++;
+		meetings.add(new PastMeetingImpl(countMeeting, date, contacts, text));
+		countMeeting++;
 	}
 
 	@Override
@@ -190,4 +190,92 @@ public class ContactManagerImpl implements ContactManager {
 
 	}
 
+	private String createFile()
+	{
+		String output = "";
+		
+		for (Contact c : contacts) output += contactToFileString(c) + "\n";
+		
+		for (Meeting m : meetings) output += meetingToFileString(m) + "\n";
+
+		output += "<end>";
+		
+		return output;
+	}
+	
+	private String contactToFileString(Contact c)
+	{		
+		String notInName = "Name";
+		
+		//these could be a lot prettier with lambdas
+		int nameIterator = 1;
+		while (c.getName().contains(notInName))
+		{
+			notInName = "Name" + nameIterator;
+			nameIterator++;
+		}
+		
+		String notInNotes = "Notes";
+		
+		int notesIterator = 1;
+		while (c.getName().contains(notInNotes))
+		{
+			notInNotes = "Notes" + notesIterator;
+			notesIterator++;
+		}
+		
+		String output = "<Contact>" + c.getId();
+		output += "<" + notInName + ">" + c.getName() + "<\\" + notInName + ">";
+		output += "<" + notInNotes + ">" + c.getNotes() + "<\\" + notInNotes + ">";
+		output += "<\\Contact>";
+		
+		return output;
+	}
+	
+	private String meetingToFileString(Meeting m)
+	{
+		String stringId = "<ID>" + m.getId() + "<\\ID>";
+
+		String stringCtId ="<Contacts>";
+		for (Contact c : m.getContacts()) stringCtId += c.getId() + ",";
+		stringCtId = stringCtId.substring(0, stringCtId.length() - 1) + "<\\Contacts>";
+		
+		String stringDate = "<Date>" + m.getDate().get(Calendar.YEAR) + "," 
+										+ m.getDate().get(Calendar.MONTH) + ","
+										+ m.getDate().get(Calendar.DAY_OF_MONTH) + "," 
+										+ m.getDate().get(Calendar.HOUR) + ","
+										+ m.getDate().get(Calendar.MINUTE) + ","
+										+ m.getDate().get(Calendar.SECOND) + "<\\Date>";
+		
+		String stringNotes = "", stringClassBegin, stringClassEnd;
+		
+		try
+		{
+			String notInNotes = "Notes";
+			int notesIterator = 1;
+			while (((PastMeeting)m).getNotes().contains(notInNotes))
+			{
+				notInNotes = "Notes" + notesIterator;
+				notesIterator++;
+			}
+			
+			stringNotes = "<" + notInNotes + ">" + ((PastMeeting)m).getNotes() + "<\\" + notInNotes + ">";
+			stringClassBegin = "<PastMeeting>";
+			stringClassEnd = "<\\PastMeeting>";
+		} catch (ClassCastException e)
+		{
+			stringNotes = "";
+			stringClassBegin = "<FutureMeeting>";
+			stringClassEnd = "<\\FutureMeeting>";
+		}
+			
+		return stringClassBegin + stringId + stringCtId + stringDate + stringNotes + stringClassEnd;
+	}
+
+	
+	private void readFile()
+	{
+		
+	}
+	
 }
