@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
  * 
 
 
+Asumtion: Not need to cater to different timezones
+
 
 
 */
@@ -325,12 +327,7 @@ public class ContactManagerImpl implements ContactManager {
 		for (Contact c : m.getContacts()) stringCtId += c.getId() + ",";
 		stringCtId = stringCtId.substring(0, stringCtId.length() - 1) + "<\\Contacts>";
 		
-		String stringDate = "<Date>" + m.getDate().get(Calendar.YEAR) + "," 
-										+ m.getDate().get(Calendar.MONTH) + ","
-										+ m.getDate().get(Calendar.DAY_OF_MONTH) + "," 
-										+ m.getDate().get(Calendar.HOUR) + ","
-										+ m.getDate().get(Calendar.MINUTE) + ","
-										+ m.getDate().get(Calendar.SECOND) + "<\\Date>";
+		String stringDate = "<Date>" + m.getDate().getTimeInMillis() + "<\\Date>";
 		
 		String stringNotes = "", stringClassBegin, stringClassEnd;
 		
@@ -414,8 +411,9 @@ public class ContactManagerImpl implements ContactManager {
 			int[] ctIds = getIntsByTag(line,"Contacts");
 			for (int i = 0; i < ctIds.length; i++) cts.add(contacts.get(ctIds[i]-1));
 			
-			int[] dArr = getIntsByTag(line,"Date");
-			Calendar date = new GregorianCalendar(dArr[0],dArr[1],dArr[2],dArr[3],dArr[4],dArr[5]);
+			Calendar date = new GregorianCalendar();
+			Long time = Long.parseLong(getStringByTag(line,"Date"));
+			date.setTimeInMillis(time);
 			
 			if (getTagWithinArrows(line,0).equals("PastMeeting"))
 			{
