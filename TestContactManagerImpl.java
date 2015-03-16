@@ -270,18 +270,6 @@ public class TestContactManagerImpl {
 		PastMeeting pm = new PastMeetingImpl(2,pastDateMonth,contacts2,"Some notes.");
 		
 		assertEquals(pm.getContacts(),cm.getMeeting(2).getContacts());
-		System.out.println(pm.getDate().get(Calendar.YEAR));
-		System.out.println(cm.getMeeting(2).getDate().get(Calendar.YEAR));
-		System.out.println(pm.getDate().get(Calendar.MONTH));
-		System.out.println(cm.getMeeting(2).getDate().get(Calendar.MONTH));
-		System.out.println(pm.getDate().get(Calendar.DAY_OF_MONTH));
-		System.out.println(cm.getMeeting(2).getDate().get(Calendar.DAY_OF_MONTH));
-		System.out.println(pm.getDate().get(Calendar.HOUR));
-		System.out.println(cm.getMeeting(2).getDate().get(Calendar.HOUR));
-		System.out.println(pm.getDate().get(Calendar.MINUTE));
-		System.out.println(cm.getMeeting(2).getDate().get(Calendar.MINUTE));
-		System.out.println(pm.getDate().get(Calendar.SECOND));
-		System.out.println(cm.getMeeting(2).getDate().get(Calendar.SECOND));
 		
 		cm.getMeeting(2).getDate().getTime();
 		
@@ -838,6 +826,8 @@ public class TestContactManagerImpl {
 		
 		List<Meeting> rtn = cm3Contacts.getFutureMeetingList(futureDateMinute);
 		
+		System.out.println(rtn.size());
+		
 		//two lists required as not specified which duplicate to take, so need to check if either
 		List<Meeting> list1 = new ArrayList<Meeting>();
 		list1.add(new FutureMeetingImpl(1,futureDateMinute,contacts2));
@@ -847,7 +837,8 @@ public class TestContactManagerImpl {
 		list1.add(new FutureMeetingImpl(2,futureDateMinute,contacts2));
 		list1.add(new FutureMeetingImpl(3,futureDateHour,contacts2));
 		
-		assertTrue(list1.equals(rtn) || list2.equals(rtn));
+		assertEquals(2,rtn.size());
+		assertTrue(rtn.containsAll(list1) || rtn.containsAll(list2));
 	}
 	
 	@Test 
@@ -1011,7 +1002,8 @@ public class TestContactManagerImpl {
 		list1.add(new PastMeetingImpl(2,pastDateMinute,contacts2, "Past meeting"));
 		list1.add(new PastMeetingImpl(3,pastDateHour,contacts2, "Past meeting"));
 		
-		assertTrue(list1.equals(rtn) || list2.equals(rtn));	
+		assertEquals(2,rtn.size());
+		assertTrue(rtn.containsAll(list1) || rtn.containsAll(list2));	
 	}
 	
 	// Test addNewPastMeeting()
