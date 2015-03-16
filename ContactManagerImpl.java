@@ -239,18 +239,15 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public Set<Contact> getContacts(String name) {
 		
-		if (name == null) throw new NullPointerException("Name string is null.");
+		if (name == null || name=="") throw new NullPointerException("Name string is null.");
 		
 		Set<Contact> rtn = new HashSet<Contact>();
 		
-		if (name != "") //Assumed that searching for "" should match nothing not everything, as not mentioned in spec.
-		{
 			for (Contact c : contacts)
 			{
 				// Assumed that name search is case sensitive as not specified
 				if (c.getName().contains(name)) rtn.add(c);
 			}
-		}
 		
 		return rtn;
 	}
