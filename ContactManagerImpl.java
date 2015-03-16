@@ -58,6 +58,8 @@ public class ContactManagerImpl implements ContactManager {
 	List<Contact> contacts = new ArrayList<Contact>();
 	List<Meeting> meetings = new ArrayList<Meeting>();
 	
+	Comparator<Meeting> duplicateMeeting = (m,p) -> {if (m.getDate() == p.getDate() && m.getContacts() == p.getContacts()) return 1; else return 0;};
+	
 	public ContactManagerImpl()
 	{
 		CONTACTS_FILE = new File("Contact.txt");
@@ -154,12 +156,11 @@ public class ContactManagerImpl implements ContactManager {
 		//Assumed duplicates are where time and contacts match for two meetings (it's impossible for id's to match)
 		//can't use .distinct() as this uses equals(), which compares id's.
 		//Have therefore kept the last meeting in the list of every contact and time match.
-		Comparator<Meeting> distinctMeeting = (m,p) -> {if (m.getDate() == p.getDate() && m.getContacts() == p.getContacts()) return 1; else return 0;};
 
 		for (int i = 0; i < withDups.size(); i++)
 		{
 			boolean duplicate = false;
-			for (int j=i+1; j<withDups.size(); j++) if(distinctMeeting.compare(withDups.get(i), withDups.get(j))==1) duplicate=true;
+			for (int j=i+1; j<withDups.size(); j++) if(duplicateMeeting.compare(withDups.get(i), withDups.get(j))==1) duplicate=true;
 			if (!duplicate) rtn.add(withDups.get(i));
 		}
 			
@@ -170,15 +171,27 @@ public class ContactManagerImpl implements ContactManager {
 	public List<PastMeeting> getPastMeetingList(Contact contact) {
 		if (!contacts.contains(contact)) throw new IllegalArgumentException("Contact not known");
 		
-		List<Meeting> pm = meetings.stream()
+		List<Meeting> pmWithDups = meetings.stream()
 				.filter(x -> Clock.getCurrent().compareTo(x.getDate()) >= 0)
 				.filter(x -> x.getContacts().contains(contact))
 				.sorted(chronological)
 				.collect(Collectors.toList());
 	
 		List<PastMeeting> rtn = new ArrayList<PastMeeting>();
+		List<Meeting> pmNoDups = new ArrayList<Meeting>();
 		
-		for (Meeting m : pm)
+		//Assumed only contacts and time need to be matched (and not notes) as people cant be in two places at once
+		for (int i = 0; i < pmWithDups.size(); i++)
+		{
+			boolean duplicate = false;
+			for (int j=i+1; j<pmWithDups.size(); j++) if(duplicateMeeting.compare(pmWithDups.get(i), pmWithDups.get(j))==1) duplicate=true;
+			if (!duplicate) pmNoDups.add(pmWithDups.get(i));
+		}
+		
+		// I have assumed that, if a meeting took place in the past but is not yet a pastMeeting, 
+		//that it should be converted to one
+		
+		for (Meeting m : pmNoDups)
 		{
 			try{
 				rtn.add((PastMeeting)m);
