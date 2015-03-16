@@ -201,9 +201,10 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public void addMeetingNotes(int id, String text) {
+		if (text == null) throw new NullPointerException("Text is null.");
 		if (id <= 0 || id > meetings.size()) throw new IllegalArgumentException("Meeting doesn't exist.");
 		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) >=0) throw new IllegalStateException("Meeting set for time in future.");
-		if (text == null) throw new NullPointerException("Text is null.");
+
 		
 		//Assumed as not specified that setting notes for a meeting with already notes will overwrite these
 		meetings.set(id - 1, new PastMeetingImpl(meetings.get(id - 1), text));
@@ -379,13 +380,6 @@ public class ContactManagerImpl implements ContactManager {
 		
 		
 		
-	}
-	
-	private void readFile()
-	{
-	
-		
-		//set global values
 	}
 	
 	public boolean readLine(String line)
