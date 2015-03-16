@@ -1,6 +1,13 @@
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,8 +52,7 @@ public class ContactManagerImpl implements ContactManager {
 	private final File CONTACTS_FILE;
 	
     Comparator<Meeting> chronological = (m1, m2) -> m1.getDate().compareTo(m2.getDate());
-    
-    
+        
 	int countContact = 1, countMeeting = 1;
 	Clock clock = new Clock();
 	List<Contact> contacts = new ArrayList<Contact>();
@@ -251,19 +257,30 @@ public class ContactManagerImpl implements ContactManager {
 
 	@Override
 	public void flush() {
-		// TODO Auto-generated method stub
+
+		CONTACTS_FILE.delete();
+		
+		try (PrintWriter out = new PrintWriter(CONTACTS_FILE)){
+			CONTACTS_FILE.createNewFile();
+			out.write(createFile());
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 
 	public String createFile()
 	{
 		String output = "";
-		
+		//will need to neaten up \n bits as will have gaps in text
 		for (Contact c : contacts) output += contactToFileString(c) + "\n";
 		
 		for (Meeting m : meetings) output += meetingToFileString(m) + "\n";
 
-		output += "<end>";
+	//	output += "<end>";
 		
 		return output;
 	}
@@ -343,13 +360,29 @@ public class ContactManagerImpl implements ContactManager {
 	private void launch()
 	{
 
-		
+//can probably remove the first part of the if statement as exception will catch it		
 		if (!CONTACTS_FILE.exists())
 			try {
 				CONTACTS_FILE.createNewFile();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		else
+		{
+			BufferedReader in;
+			try {
+				in = new BufferedReader(new FileReader(CONTACTS_FILE));
+				String line;
+				while ((line = in.readLine()) != null) 
+					{
+					readLine(line);
+					}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		
 		
@@ -365,8 +398,7 @@ public class ContactManagerImpl implements ContactManager {
 	
 	public boolean readLine(String line)
 	{
-		if (line.equals("<end>")) return true;
-		else if (getTagWithinArrows(line,0).equals("Contact")) 
+		if (getTagWithinArrows(line,0).equals("Contact")) 
 		{
 			String nameTag = getStringByTag(line,"NameTag");
 			String notesTag = getStringByTag(line,"NotesTag");
