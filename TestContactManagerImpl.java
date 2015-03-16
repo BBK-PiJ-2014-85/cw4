@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -116,6 +117,7 @@ public class TestContactManagerImpl {
 	 * 
 	 * TODO: Write excpetions for file reading, including id's not right
 	 * TODO: Fix sloppy list to id assumption
+	 * TODO: test int return on future meeting. point out assumption needing to be made for adding contacts and past meeting as id not returned although could search after
 
 	 */
 	
@@ -251,7 +253,6 @@ public class TestContactManagerImpl {
 		
 		cm = new ContactManagerImpl();
 		
-		assertEquals(c1,getOnlyContactFromSet(cm.getContacts(1)));
 		assertEquals(c2,getOnlyContactFromSet(cm.getContacts(2)));
 		assertEquals(c3,getOnlyContactFromSet(cm.getContacts(3)));
 	}
@@ -265,9 +266,31 @@ public class TestContactManagerImpl {
 		cm3Contacts = null;
 		
 		cm = new ContactManagerImpl("cm3.txt");
+
+		PastMeeting pm = new PastMeetingImpl(2,pastDateMonth,contacts2,"Some notes.");
+		
+		assertEquals(pm.getContacts(),cm.getMeeting(2).getContacts());
+		System.out.println(pm.getDate().get(Calendar.YEAR));
+		System.out.println(cm.getMeeting(2).getDate().get(Calendar.YEAR));
+		System.out.println(pm.getDate().get(Calendar.MONTH));
+		System.out.println(cm.getMeeting(2).getDate().get(Calendar.MONTH));
+		System.out.println(pm.getDate().get(Calendar.DAY_OF_MONTH));
+		System.out.println(cm.getMeeting(2).getDate().get(Calendar.DAY_OF_MONTH));
+		System.out.println(pm.getDate().get(Calendar.HOUR));
+		System.out.println(cm.getMeeting(2).getDate().get(Calendar.HOUR));
+		System.out.println(pm.getDate().get(Calendar.MINUTE));
+		System.out.println(cm.getMeeting(2).getDate().get(Calendar.MINUTE));
+		System.out.println(pm.getDate().get(Calendar.SECOND));
+		System.out.println(cm.getMeeting(2).getDate().get(Calendar.SECOND));
+		
+		cm.getMeeting(2).getDate().getTime();
+		
+		assertEquals(pm.getDate(),cm.getMeeting(2).getDate());
+		
+		
 		
 		assertEquals(new FutureMeetingImpl(1,futureDateMonth,contacts2),cm.getMeeting(1));
-		assertEquals(new FutureMeetingImpl(2,futureDateMonth,contacts2),cm.getMeeting(1));
+		assertEquals(new PastMeetingImpl(2,pastDateMonth,contacts2,"Some notes."),cm.getMeeting(2));
 	}
 	
 	@Test 
@@ -381,16 +404,16 @@ public class TestContactManagerImpl {
 	@Test 
 	public void testAddFutureMeetingStoredWhenNoCurrentMeetings() {
 		cm2Contacts.addFutureMeeting(contacts2,futureDateYear);
-		ContactManager tempCM = new ContactManagerImpl();
-		assertEquals(new MeetingImpl(1,futureDateYear,contacts2),tempCM.getFutureMeeting(1));
+		ContactManager tempCM = new ContactManagerImpl("cm2.txt");
+		assertEquals(new FutureMeetingImpl(1,futureDateYear,contacts2),tempCM.getFutureMeeting(1));
 	}
 	
 	@Test 
 	public void testAddFutureMeetingStoredWhenCurrentMeetings() {
 		cm2Contacts.addFutureMeeting(contacts2,futureDateYear);
 		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
-		ContactManager tempCM = new ContactManagerImpl();
-		assertEquals(new MeetingImpl(1,futureDateDay,contacts2),tempCM.getFutureMeeting(2));
+		ContactManager tempCM = new ContactManagerImpl("cm2.txt");
+		assertEquals(new FutureMeetingImpl(2,futureDateDay,contacts2),tempCM.getFutureMeeting(2));
 	}
 	
 	@Test public void testAddFutureMeetingFutureDateYear() {
@@ -436,7 +459,7 @@ public class TestContactManagerImpl {
 	
 	@Test public void testAddFutureMeetingIDSecondOnLoad() {
 		cm2Contacts.addFutureMeeting(contacts2,futureDateDay);
-		ContactManager tempCM = new ContactManagerImpl();
+		ContactManager tempCM = new ContactManagerImpl("cm2.txt");
 		assertNull(tempCM.getFutureMeeting(2));
 		tempCM.addFutureMeeting(contacts2,futureDateMonth);
 		assertNotNull(tempCM.getFutureMeeting(2));
@@ -534,6 +557,12 @@ public class TestContactManagerImpl {
 		
 		Clock.setTime(new GregorianCalendar(2050,01,01));
 		cm2Contacts.getFutureMeeting(1);
+	}
+	
+	@Test
+	public void testGetFutureMeetingDoesntReturnPastMeetingInFuture()
+	{
+		fail("Still need to write this");
 	}
 	
 	@Test 
@@ -671,6 +700,15 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
+	public void testGetFutureListContactDoesntReturnPastMeetingInFuture() {
+		// Pastmeetings can be added with future dates via the addNewPastMeeting method. Assumption is these should not be
+		// returned via the getFutureList method.
+		cm3Contacts.addNewPastMeeting(contacts2, futureDateDay,"Notes");
+		
+		assertTrue(cm3Contacts.getFutureMeetingList(c2).isEmpty());
+	}
+	
+	@Test 
 	public void testGetFutureListContactFutureAndPastMeetingsExist() {
 		cm3Contacts.addFutureMeeting(contacts2, futureDateDay);
 		cm3Contacts.addNewPastMeeting(contacts2, pastDateMonth, "A past meeting");
@@ -793,9 +831,33 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testGetFutureListDateRemoveDuplicateTime(){
-		fail("Need this clarified. What duplicates need to be removed? All the same or just on date?");
+		//Assuming that if a meeting is same time and contacts list then is the same (i.e. IDs can be different)
+		cm3Contacts.addFutureMeeting(contacts2, futureDateMinute);
+		cm3Contacts.addFutureMeeting(contacts2, futureDateMinute);
+		cm3Contacts.addFutureMeeting(contacts2, futureDateHour);
+		
+		List<Meeting> rtn = cm3Contacts.getFutureMeetingList(futureDateMinute);
+		
+		//two lists required as not specified which duplicate to take, so need to check if either
+		List<Meeting> list1 = new ArrayList<Meeting>();
+		list1.add(new FutureMeetingImpl(1,futureDateMinute,contacts2));
+		list1.add(new FutureMeetingImpl(3,futureDateHour,contacts2));
+		
+		List<Meeting> list2 = new ArrayList<Meeting>();
+		list1.add(new FutureMeetingImpl(2,futureDateMinute,contacts2));
+		list1.add(new FutureMeetingImpl(3,futureDateHour,contacts2));
+		
+		assertTrue(list1.equals(rtn) || list2.equals(rtn));
 	}
-
+	
+	@Test 
+	public void testGetFutureListDoesntReturnPastMeetingInFuture(){
+		//It is possible to add a past meeting with a future date. I've assumed this shouldn't be returned via this method.  
+		cm3Contacts.addNewPastMeeting(contacts2, futureDateDay, "Notes");
+		
+		assertTrue(cm3Contacts.getFutureMeetingList(futureDateDay).isEmpty());
+	}
+	
 	// Test getPastMeetingList(Contact)
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -935,7 +997,21 @@ public class TestContactManagerImpl {
 	@Test
 	public void testGetPastListContactNoDuplicates()
 	{
-		fail("Need to determine what is meant as a duplicate");
+		//assume duplicates means everything same apart from ID
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMinute, "Past meeting");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMinute, "Past meeting");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateHour, "Past meeting");
+		
+		List<PastMeeting> rtn = cm2Contacts.getPastMeetingList(c1);
+		List<PastMeeting> list1 = new ArrayList<PastMeeting>();
+		list1.add(new PastMeetingImpl(1,pastDateMinute,contacts2, "Past meeting"));
+		list1.add(new PastMeetingImpl(3,pastDateHour,contacts2, "Past meeting"));
+		
+		List<PastMeeting> list2 = new ArrayList<PastMeeting>();
+		list1.add(new PastMeetingImpl(2,pastDateMinute,contacts2, "Past meeting"));
+		list1.add(new PastMeetingImpl(3,pastDateHour,contacts2, "Past meeting"));
+		
+		assertTrue(list1.equals(rtn) || list2.equals(rtn));	
 	}
 	
 	// Test addNewPastMeeting()
@@ -965,7 +1041,7 @@ public class TestContactManagerImpl {
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddPastMeetingSecondContactNotExist() {
 
-		cm1Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Didn't know who hos mate was");
+		cm1Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Didn't know who his mate was");
 	}
 	
 	@Test(expected=IllegalArgumentException.class) 
@@ -975,8 +1051,11 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
-	public void testAddPastMeetingDateInFuture() {
-		fail("Need clarificaion on what to do with these");
+	public void testAddPastMeetingDateInFutureWorks() {
+		//Spec doesn't have an exception for adding pastMeeting in the Future, so here I have checked it is added as required 
+		
+		cm3Contacts.addNewPastMeeting(contacts2, futureDateMonth, "Psychic notes!");
+		assertEquals(new PastMeetingImpl(1,futureDateMonth, contacts2,"Psychic notes!"),cm3Contacts.getMeeting(1));
 	}
 	
 	
@@ -1029,11 +1108,14 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testAddPastMeetingFileUpdated() {
-		fail("Need to determine how to test file updated, and where this needs to happen?");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "First meeting");
+		
+		ContactManager cmTest = new ContactManagerImpl("cm2.txt");
+		assertEquals(new PastMeetingImpl(1,pastDateDay,contacts2,"First meeting"),cmTest.getMeeting(1));
 	}
 	
 	// Test addMeetingNotes()
-	/*
+
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddMeetingNotesMeetingNotExistException() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
@@ -1077,29 +1159,20 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
-	public void testAddMeetingNotesMeetingNotesNotEmpty() {
-		fail("May not be required depending on spec clarification");
-	}
-	
-	@Test 
-	public void testAddMeetingNotesMeetingNotesEmptyNewNotesEmpty() {
-		fail("May not be required depending on spec clarification");
-	}
-	
-	@Test 
-	public void testAddMeetingNotesMeetingNoteNotEmptyNotesEmpty() {
-		fail("May not be required depending on spec clarification");
-	}
-	
-	@Test
-	public void testAddMeetingNotesToNotesAlreadyExisting()
-	{
-		fail("Need clarification before I know what to do here");
+	public void testAddMeetingNotesOverwritesNotes() {
+		//Assumption that this overwrites notes, as no exception is returned for not doing so
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth,"Original notes.");
+		cm2Contacts.addMeetingNotes(1, "Changed notes.");
+		assertEquals("Changed notes.",cm2Contacts.getPastMeeting(1).getNotes());
 	}
 	
 	@Test 
 	public void testAddMeetingNotesFileUpdated() {
-		fail("To be determined if this is the right approach");
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth,"Some notes.");
+		cm2Contacts.addMeetingNotes(1, "Changed notes.");
+		
+		ContactManagerImpl cmTemp = new ContactManagerImpl("cm2.txt");
+		assertEquals("Changed notes.",cmTemp.getPastMeeting(1).getNotes());
 	}
 
 	// Test addNewContact()
