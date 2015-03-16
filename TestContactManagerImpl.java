@@ -1298,10 +1298,10 @@ public class TestContactManagerImpl {
 		Set<Contact> ct = cm3Contacts.getContacts(1,4,3);
 	}
 	
-	@Test
+	@Test(expected=IllegalArgumentException.class)
 	public void testGetContactsNoParameters()
 	{
-		fail("Currently unclear if no parameters should return empty set or exception");
+		cm2Contacts.getContacts();
 	}
 	
 	// Test getContacts(String)
