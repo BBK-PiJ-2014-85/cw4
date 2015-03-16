@@ -143,12 +143,26 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public List<Meeting> getFutureMeetingList(Calendar date) {
 		
-		List<Meeting> rtn = meetings.stream()
+		List<Meeting> withDups = meetings.stream()
 				.filter(x -> x.getDate().get(Calendar.YEAR) == date.get(Calendar.YEAR))
 				.filter(x -> x.getDate().get(Calendar.DAY_OF_YEAR) == date.get(Calendar.DAY_OF_YEAR))
 				.sorted(chronological)
 				.collect(Collectors.toList());
 		
+		List<Meeting> rtn = new ArrayList<Meeting>();
+		
+		//Assumed duplicates are where time and contacts match for two meetings (it's impossible for id's to match)
+		//can't use .distinct() as this uses equals(), which compares id's.
+		//Have therefore kept the last meeting in the list of every contact and time match.
+		Comparator<Meeting> distinctMeeting = (m,p) -> {if (m.getDate() == p.getDate() && m.getContacts() == p.getContacts()) return 1; else return 0;};
+
+		for (int i = 0; i < withDups.size(); i++)
+		{
+			boolean duplicate = false;
+			for (int j=i+1; j<withDups.size(); j++) if(distinctMeeting.compare(withDups.get(i), withDups.get(j))==1) duplicate=true;
+			if (!duplicate) rtn.add(withDups.get(i));
+		}
+			
 		return rtn;
 	}
 
