@@ -148,9 +148,9 @@ public class TestContactManagerImpl {
 		Clock.setTime(currentDate);
 		
 		if (contactFile.exists()) contactFile.delete();
-		if (cm1File.exists()) contactFile.delete();
-		if (cm2File.exists()) contactFile.delete();
-		if (cm3File.exists()) contactFile.delete();
+		if (cm1File.exists()) cm1File.delete();
+		if (cm2File.exists()) cm2File.delete();
+		if (cm3File.exists()) cm3File.delete();
 		cm = new ContactManagerImpl();
 		
 		c1 = new ContactImpl(1,"Bob","Nice guy");
