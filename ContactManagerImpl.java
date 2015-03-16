@@ -76,7 +76,7 @@ public class ContactManagerImpl implements ContactManager {
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		
 		if (Clock.getCurrent().compareTo(date) >=0 ) throw new IllegalArgumentException("Date is in the past");
-		if (!this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contact not found");
+		if (!this.contacts.containsAll(contacts) || contacts.isEmpty()) throw new IllegalArgumentException("Contact not found");
 		
 		meetings.add(new FutureMeetingImpl(countMeeting,date,contacts));
 		countMeeting++;
