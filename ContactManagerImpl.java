@@ -404,8 +404,9 @@ public class ContactManagerImpl implements ContactManager {
 			String notesTag = getStringByTag(line,"NotesTag");
 
 			contacts.add(new ContactImpl(getIntsByTag(line,"ID")[0],getStringByTag(line,nameTag),getStringByTag(line,notesTag)));
+			countContact++;
 		}
-		else if (getTagWithinArrows(line,0).equals("PastMeeting")) 
+		else if (getTagWithinArrows(line,0).equals("FutureMeeting") || getTagWithinArrows(line,0).equals("PastMeeting"))
 		{
 			int id = getIntsByTag(line,"ID")[0];
 			
@@ -423,6 +424,8 @@ public class ContactManagerImpl implements ContactManager {
 			} else{
 				meetings.add(new FutureMeetingImpl(id,date,cts));
 			}
+			
+			countMeeting++;
 		}
 		
 		return false;
