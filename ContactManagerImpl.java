@@ -78,6 +78,7 @@ public class ContactManagerImpl implements ContactManager {
 		
 		meetings.add(new FutureMeetingImpl(countMeeting,date,contacts));
 		countMeeting++;
+		flush();
 		return countMeeting - 1;
 	}
 
@@ -94,16 +95,7 @@ public class ContactManagerImpl implements ContactManager {
 			Should a meeting therefore exist in the past and have been requested, it will be converted
 			to a past meeting with no notes, and then returned.
 		*/
-		
-/*		Optional<Meeting> rtnItemOpt =  
-				meetings.stream()
-						.filter(x -> x.getId() == id)
-						.findFirst()
-						;
-		
-		if (!rtnItemOpt.isPresent()) return null;
-		else if (Clock.getCurrent().compareTo(rtnItemOpt.getDate()) <= 0) throw new IllegalArgumentException("Meeting is in the past")
-	*/	
+
 		if (id < 0 || id > meetings.size()) return null;
 		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) <= 0) throw new IllegalArgumentException("Meeting is in the past");
 
@@ -120,7 +112,6 @@ public class ContactManagerImpl implements ContactManager {
 		
 		return rtn;
 	}
-
 
 	@Override
 	public FutureMeeting getFutureMeeting(int id) {
@@ -196,6 +187,7 @@ public class ContactManagerImpl implements ContactManager {
 		if (contacts == null || date == null || text == null) throw new NullPointerException("A parameter is null");
 		if (contacts.isEmpty() || !this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contacts either empty or at least one doesn't exist");
 		meetings.add(new PastMeetingImpl(countMeeting, date, contacts, text));
+		flush();
 		countMeeting++;
 	}
 
@@ -208,6 +200,7 @@ public class ContactManagerImpl implements ContactManager {
 		
 		//Assumed as not specified that setting notes for a meeting with already notes will overwrite these
 		meetings.set(id - 1, new PastMeetingImpl(meetings.get(id - 1), text));
+		flush();
 	}
 
 	@Override
@@ -217,6 +210,7 @@ public class ContactManagerImpl implements ContactManager {
 		else {
 			contacts.add(new ContactImpl(countContact,name,notes));
 			countContact++;
+			flush();
 			}
 	}
 
