@@ -121,7 +121,13 @@ public class ContactManagerImpl implements ContactManager {
 		
 		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) >= 0) throw new IllegalArgumentException("Meeting is in the past");
 		
+		try
+		{
 		return (FutureMeeting) meetings.get(id - 1);
+		} catch (ClassCastException e)
+		{
+			throw new IllegalArgumentException("Meeting is a PastMeeting");
+		}
 	}
 
 	@Override
