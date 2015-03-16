@@ -308,7 +308,7 @@ public class TestContactManagerImpl {
 		cm = new ContactManagerImpl("cm3.txt");
 		cm.addNewPastMeeting(contacts2,pastDateDay,"Notes");
 		
-		assertEquals(new PastMeetingImpl(2,futureDateDay,contacts2),cm.getMeeting(2));
+		assertEquals(new PastMeetingImpl(2,pastDateDay,contacts2,"Notes"),cm.getMeeting(2));
 	}
 
 	
