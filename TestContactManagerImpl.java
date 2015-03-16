@@ -1232,12 +1232,20 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testAddNewContactFileUpdatedFirst() {
-		fail("Unsure on current scope of updating");
+		cm.addNewContact("Bob", "Unoriginal parents.");
+		ContactManager cmTemp = new ContactManagerImpl("Contact.txt");
+		Set<Contact> set = new HashSet<Contact>();
+		set.add(new ContactImpl(1,"Bob","Unoriginal parents."));
+		assertEquals(set,cmTemp.getContacts(1));
 	}
 	
 	@Test 
 	public void testAddNewContactFileUpdatedSecond() {
-		fail("Unsure on current scope of updating");
+		cm1Contacts.addNewContact("Bob", "Unoriginal parents.");
+		ContactManager cmTemp = new ContactManagerImpl("cm1.txt");
+		Set<Contact> set = new HashSet<Contact>();
+		set.add(new ContactImpl(2,"Bob","Unoriginal parents."));
+		assertEquals(set,cmTemp.getContacts(2));
 	}
 	
 	// Test getContacts(int)
