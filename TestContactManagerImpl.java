@@ -1412,27 +1412,18 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
-	public void testGetContactDoesntMatchCase() {
-		fail("Need to determine if this should be case sensitive or not");
+	public void testGetContactRequiresMatchedCase() {
+		Contact first = new ContactImpl(1,"Mrs White", "Had a candlestick");
+
+		
+		cm.addNewContact(first.getName(), first.getNotes());
+
+		
+		Set<Contact> ct = cm.getContacts("MRS");
+		
+		assertEquals(0,ct.size());
 	}
-/*	
-	// Test flush()
-	
-	@Test 
-	public void testFlushRunsWhenProgramClosed() {
-		fail("Scope for saving file not yet confirmed");
-	}
-	
-	@Test 
-	public void testFlushStoresContactsChanges() {
-		fail("Scope for saving file not yet confirmed");
-	}
-	
-	@Test 
-	public void testFlushStoresMeetingChanges() {
-		fail("Scope for saving file not yet confirmed");
-	}
-*/	
+
 	
 
 }
