@@ -42,9 +42,7 @@ import java.util.stream.Collectors;
  * 
  * 
 
-
 Asumtion: Not need to cater to different timezones
-
 
 
 */
@@ -226,8 +224,8 @@ public class ContactManagerImpl implements ContactManager {
 		
 		Set<Contact> rtn = new HashSet<Contact>();
 		
-		//Assumed that entering no integers should return empty list as there is no id not to match
-		if (ids.length == 0) return rtn;
+		//Assumed that entering no integers should throw illegal argument exception as mentioned in forum.
+		if (ids.length == 0) throw new IllegalArgumentException("Empty input");
 		
 		for (int i : ids) 
 		{
