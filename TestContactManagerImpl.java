@@ -109,6 +109,10 @@ public class TestContactManagerImpl {
 	 * TODO: test dates equal properly as need to round in serialisation. what of milli gets rounded?
 	 * TODO: Test meeting chaing to past, with "" notes, when serialised
 	 * TODO: Test the notes1 notes2 etc works.
+	 * TODO: Testbad files aren't read in.
+	 * TODO: Test meetings changing works properly in file
+	 * TODO: Test things being changed and added in different orders
+	 * TODO: Check nothing printed after exceptions
 	 * 
 	 * TODO: Write excpetions for file reading, including id's not right
 	 * TODO: Fix sloppy list to id assumption
@@ -228,83 +232,88 @@ public class TestContactManagerImpl {
 		assertEquals(c2,getOnlyContactFromSet(cm.getContacts(2)));
 		assertEquals(c3,getOnlyContactFromSet(cm.getContacts(3)));
 	}
-/*	
+	
 	@Test 
 	public void testFileContactsReadCorrectlyWithMeetings() 
 	{
-		copyFile(testMeetingsFile,contactFile);
+		ContactManager cm3TestContacts = new ContactManagerImpl("Contact.txt");
+		cm3TestContacts.addFutureMeeting(contacts2,futureDateMonth);
+		cm3TestContacts.addNewPastMeeting(contacts2,pastDateMonth,"Some notes.");
+		cm3TestContacts.addNewContact("Bob","Nice guy");
+		cm3TestContacts.addFutureMeeting(contacts2,futureDateDay);
+		cm3TestContacts.addNewPastMeeting(contacts2,pastDateDay,"Some notes.");
+		cm3TestContacts.addNewContact("Fred","Talks too much");
+		cm3TestContacts.addNewContact("Anon","");
+		cm3TestContacts.addFutureMeeting(contacts2,futureDateYear);
+		cm3TestContacts.addNewPastMeeting(contacts2,pastDateYear,"Some notes.");
+		cm3TestContacts.flush();
+		cm3TestContacts = null;
 		
 		cm = new ContactManagerImpl();
 		
 		assertEquals(c1,getOnlyContactFromSet(cm.getContacts(1)));
 		assertEquals(c2,getOnlyContactFromSet(cm.getContacts(2)));
 		assertEquals(c3,getOnlyContactFromSet(cm.getContacts(3)));
-		
 	}
-	
+
 	@Test 
 	public void testFileMeetingsReadCorrectly() 
 	{
-		copyFile(testMeetingsFile,contactFile);
+		cm3Contacts.addFutureMeeting(contacts2,futureDateMonth);
+		cm3Contacts.addNewPastMeeting(contacts2,pastDateMonth,"Some notes.");
+		cm3Contacts.flush();
+		cm3Contacts = null;
 		
-		cm = new ContactManagerImpl();
+		cm = new ContactManagerImpl("cm3.txt");
 		
-		assertEquals(m1,cm.getMeeting(1));
-		assertEquals(m2,cm.getMeeting(2));
-		assertEquals(m3,cm.getMeeting(3));
-		assertEquals(m4,cm.getMeeting(4));
+		assertEquals(new FutureMeetingImpl(1,futureDateMonth,contacts2),cm.getMeeting(1));
+		assertEquals(new FutureMeetingImpl(2,futureDateMonth,contacts2),cm.getMeeting(1));
 	}
 	
 	@Test 
 	public void testFileReadNextContactIDCorrect() 
 	{
-		copyFile(testMeetingsFile,contactFile);
+		cm3Contacts.flush();
+		cm3Contacts = null;
 		
-		cm = new ContactManagerImpl();
+		Contact newContact = new ContactImpl(4,"Extra Added","Next contact");
+		Set<Contact> newSet = new HashSet<Contact>();
+		newSet.add(newContact);
+		cm = new ContactManagerImpl("cm3.txt");
+		cm.addNewContact(newContact.getName(), newContact.getNotes());
 		
-		cm.addNewContact("Extra Added", "Next contact");
-		assertEquals(4,getOnlyContactFromSet(cm.getContacts("Extra Added")).getId());
+		assertEquals(newSet,cm.getContacts(4));
+	}
+
+	@Test 
+	public void testFileReadNextFutureMeetingIDCorrect() 
+	{
+		cm3Contacts.addFutureMeeting(contacts2,futureDateMonth);
+		cm3Contacts.flush();
+		cm3Contacts = null;
+
+		cm = new ContactManagerImpl("cm3.txt");
+		cm.addFutureMeeting(contacts2,futureDateDay);
+		
+		assertEquals(new FutureMeetingImpl(2,futureDateDay,contacts2),cm.getMeeting(2));
 	}
 	
 	@Test 
-	public void testFileReadNextMeetingIDCorrect() 
+	public void testFileReadNextPastMeetingIDCorrect() 
 	{
-		copyFile(testMeetingsFile,contactFile);
+		cm3Contacts.addFutureMeeting(contacts2,futureDateMonth);
+		cm3Contacts.flush();
+		cm3Contacts = null;
+
+		cm = new ContactManagerImpl("cm3.txt");
+		cm.addNewPastMeeting(contacts2,pastDateDay,"Notes");
 		
-		cm = new ContactManagerImpl();
-		
-		Set<Contact> contacts = new HashSet<Contact>();
-		contacts.add(c1);
-		contacts.add(c2);
-		
-		cm.addFutureMeeting(contacts,futureDateYear);
-		assertEquals(5, cm.getFutureMeetingList(futureDateYear).get(0).getId());
+		assertEquals(new PastMeetingImpl(2,futureDateDay,contacts2),cm.getMeeting(2));
 	}
-	
-	@Test 
-	public void testFileReadNextContactIDCorrectFirst() 
-	{
-		cm.addNewContact("Extra Added", "Next contact");
-		assertEquals(1,getOnlyContactFromSet(cm.getContacts("Extra Added")).getId());
-	}
-	
-	@Test 
-	public void testFileReadNextMeetingIDCorrectFirst() 
-	{
-		copyFile(testContactsFile,contactFile);
-		
-		cm = new ContactManagerImpl();
-		
-		Set<Contact> contacts = new HashSet<Contact>();
-		contacts.add(c1);
-		contacts.add(c2);
-		
-		cm.addFutureMeeting(contacts,futureDateYear);
-		assertEquals(1, cm.getFutureMeetingList(futureDateYear).get(0).getId());
-	}
+
 	
 	// Test addFutureMeeting()
-*/	
+
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddFutureMeetingPastDateExceptionYear() {
 		cm3Contacts.addFutureMeeting(contacts2,pastDateYear);
