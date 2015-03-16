@@ -114,6 +114,7 @@ public class TestContactManagerImpl {
 	 * TODO: Test meetings changing works properly in file
 	 * TODO: Test things being changed and added in different orders
 	 * TODO: Check nothing printed after exceptions
+	 * TODO: Change direct id calling as this stoips it testing generic interfaces
 	 * 
 	 * TODO: Write excpetions for file reading, including id's not right
 	 * TODO: Fix sloppy list to id assumption
@@ -238,13 +239,13 @@ public class TestContactManagerImpl {
 	@Test 
 	public void testFileContactsReadCorrectlyWithMeetings() 
 	{
-		ContactManager cm3TestContacts = new ContactManagerImpl("Contact.txt");
+		ContactManager cm3TestContacts = new ContactManagerImpl();
+		cm3TestContacts.addNewContact("Bob","Nice guy");
+		cm3TestContacts.addNewContact("Fred","Talks too much");
 		cm3TestContacts.addFutureMeeting(contacts2,futureDateMonth);
 		cm3TestContacts.addNewPastMeeting(contacts2,pastDateMonth,"Some notes.");
-		cm3TestContacts.addNewContact("Bob","Nice guy");
 		cm3TestContacts.addFutureMeeting(contacts2,futureDateDay);
 		cm3TestContacts.addNewPastMeeting(contacts2,pastDateDay,"Some notes.");
-		cm3TestContacts.addNewContact("Fred","Talks too much");
 		cm3TestContacts.addNewContact("Anon","");
 		cm3TestContacts.addFutureMeeting(contacts2,futureDateYear);
 		cm3TestContacts.addNewPastMeeting(contacts2,pastDateYear,"Some notes.");
@@ -547,10 +548,11 @@ public class TestContactManagerImpl {
 		cm2Contacts.getFutureMeeting(1);
 	}
 	
-	@Test
-	public void testGetFutureMeetingDoesntReturnPastMeetingInFuture()
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetFutureMeetingThrowsExceptionForPastMeetingInFuture()
 	{
-		fail("Still need to write this");
+		cm3Contacts.addNewPastMeeting(contacts2,futureDateMonth,"Notes");
+		cm3Contacts.getFutureMeeting(1);
 	}
 	
 	@Test 
@@ -689,11 +691,13 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testGetFutureListContactDoesntReturnPastMeetingInFuture() {
-		// Pastmeetings can be added with future dates via the addNewPastMeeting method. Assumption is these should not be
-		// returned via the getFutureList method.
+		// Pastmeetings can be added with future dates via the addNewPastMeeting method. 
+		// I've assumed these should be able to be added as the return item is a Meeting not a FutureMeeting
 		cm3Contacts.addNewPastMeeting(contacts2, futureDateDay,"Notes");
-		
-		assertTrue(cm3Contacts.getFutureMeetingList(c2).isEmpty());
+		List<Meeting> testList = new ArrayList<Meeting>();
+		testList.add(new PastMeetingImpl(1,futureDateDay,contacts2,"Notes"));
+		assertTrue(cm3Contacts.getFutureMeetingList(c2).containsAll(testList));
+		assertEquals(1,cm3Contacts.getFutureMeetingList(c2).size());
 	}
 	
 	@Test 
@@ -842,11 +846,13 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
-	public void testGetFutureListDoesntReturnPastMeetingInFuture(){
-		//It is possible to add a past meeting with a future date. I've assumed this shouldn't be returned via this method.  
+	public void testGetFutureListReturnsPastMeetingInFuture(){
 		cm3Contacts.addNewPastMeeting(contacts2, futureDateDay, "Notes");
-		
-		assertTrue(cm3Contacts.getFutureMeetingList(futureDateDay).isEmpty());
+		List<Meeting> testList = new ArrayList<Meeting>();
+		testList.add(new PastMeetingImpl(1,futureDateDay,contacts2,"Notes"));
+		assertTrue(cm3Contacts.getFutureMeetingList(futureDateDay).containsAll(testList));
+		assertEquals(1,cm3Contacts.getFutureMeetingList(futureDateDay).size());
+
 	}
 	
 	// Test getPastMeetingList(Contact)
