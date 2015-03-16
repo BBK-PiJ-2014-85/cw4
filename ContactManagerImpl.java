@@ -412,7 +412,7 @@ public class ContactManagerImpl implements ContactManager {
 			
 			Set<Contact> cts = new HashSet<Contact>();
 			int[] ctIds = getIntsByTag(line,"Contacts");
-			for (int i = 1; i < ctIds.length; i++) cts.add(contacts.get(ctIds[i]-1));
+			for (int i = 0; i < ctIds.length; i++) cts.add(contacts.get(ctIds[i]-1));
 			
 			int[] dArr = getIntsByTag(line,"Date");
 			Calendar date = new GregorianCalendar(dArr[0],dArr[1],dArr[2],dArr[3],dArr[4],dArr[5]);
