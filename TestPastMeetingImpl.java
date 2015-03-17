@@ -3,7 +3,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -34,7 +33,7 @@ public class TestPastMeetingImpl {
 		
 		Calendar date = new GregorianCalendar(1985,03,13);
 		
-		testMeeting = new PastMeetingImpl(1,date, attendees);
+		testMeeting = new PastMeetingImpl(1,date, attendees,"");
 	}
 
 	@Test
@@ -78,7 +77,7 @@ public class TestPastMeetingImpl {
 		
 		Calendar date2 = new GregorianCalendar(1985,03,13);
 		
-		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2);
+		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2,"");
 		
 		assertTrue(meeting2.equals(testMeeting));
 	}
@@ -133,7 +132,7 @@ public class TestPastMeetingImpl {
 		
 		Calendar date2 = new GregorianCalendar(1985,04,13);
 		
-		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2);
+		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2,"");
 		
 		assertFalse(meeting2.equals(testMeeting));
 	}
@@ -147,7 +146,7 @@ public class TestPastMeetingImpl {
 		
 		Calendar date2 = new GregorianCalendar(1985,03,13);
 		
-		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2);
+		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2,"");
 		
 		assertFalse(meeting2.equals(testMeeting));
 	}
@@ -161,7 +160,7 @@ public class TestPastMeetingImpl {
 		
 		Calendar date2 = new GregorianCalendar(1985,03,13);
 		
-		PastMeeting meeting2 = new PastMeetingImpl(2,date2,attendees2);
+		PastMeeting meeting2 = new PastMeetingImpl(2,date2,attendees2,"");
 		
 		assertFalse(meeting2.equals(testMeeting));
 	}
@@ -180,11 +179,28 @@ public class TestPastMeetingImpl {
 		attendees2.add(new ContactImpl(2,"Fred","Another bloke."));
 		
 		Calendar date2 = new GregorianCalendar(1985,03,13);
-		
-		Meeting meeting = new MeetingImpl(1,date2,attendees2);
+
 		PastMeeting past = new PastMeetingImpl(1,date2,attendees,"Notes.");
 		PastMeeting past2 = new PastMeetingImpl(testMeeting, "Notes."); 
 		assertTrue(past2.equals(past));
+	}
+	
+	@Test
+	public void testConstructorSeparateNotesNull()
+	{
+		Calendar date2 = new GregorianCalendar(1985,03,13);
+
+		PastMeeting past = new PastMeetingImpl(1,date2,attendees,null);
+		assertEquals("",past.getNotes());
+	}
+	
+	@Test
+	public void testConstructorMeetingAndNotesNull()
+	{
+		Calendar date2 = new GregorianCalendar(1985,03,13);
+		Meeting past = new PastMeetingImpl(1,date2,attendees,"Notes.");
+		PastMeeting past2 = new PastMeetingImpl(past,null);
+		assertEquals("",past2.getNotes());
 	}
 	
 	@Test
@@ -202,7 +218,7 @@ public class TestPastMeetingImpl {
 	}
 	
 	@Test
-	public void testConstructorSeparateNotesNull() //This assume objects are the same if notes are set as null or not specified
+	public void testConstructorEqualsSeparateNotesNull() //This assume objects are the same if notes are set as null or not specified
 	{
 		Set<Contact> attendees2 = new HashSet<Contact>();
 		attendees2.add(new ContactImpl(1,"Bob","A bloke."));
@@ -213,40 +229,6 @@ public class TestPastMeetingImpl {
 		PastMeeting meeting2 = new PastMeetingImpl(1,date2,attendees2,null);
 		
 		assertTrue(meeting2.equals(testMeeting));
-	}
-	
-	@Test
-	public void testConstructorPastMeetingAndNotes()
-	{
-		PastMeeting pm1 = new PastMeetingImpl(testMeeting, "Notes!");
-		
-		Set<Contact> attendees2 = new HashSet<Contact>();
-		attendees2.add(new ContactImpl(1,"Bob","A bloke."));
-		attendees2.add(new ContactImpl(2,"Fred","Another bloke."));
-		
-		Calendar date2 = new GregorianCalendar(1985,03,13);
-		
-		PastMeeting pm2 = new PastMeetingImpl(1,date2,attendees2,"Notes!");
-		
-		assertTrue(pm2.equals(pm1));
-		
-	}
-	
-	@Test
-	public void testConstructorPastMeetingAndNotesNull() //Assume if notes set to null then should still be ""
-	{
-		PastMeeting pm1 = new PastMeetingImpl(testMeeting,null);
-		
-		Set<Contact> attendees2 = new HashSet<Contact>();
-		attendees2.add(new ContactImpl(1,"Bob","A bloke."));
-		attendees2.add(new ContactImpl(2,"Fred","Another bloke."));
-		
-		Calendar date2 = new GregorianCalendar(1985,03,13);
-		
-		PastMeeting pm2 = new PastMeetingImpl(1,date2,attendees2,"");
-		
-		assertTrue(pm2.equals(pm1));
-		
 	}
 
 
