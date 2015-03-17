@@ -60,10 +60,8 @@ public class TestContactManagerImpl {
 	ContactManager cm, cm3Contacts, cm2Contacts, cm1Contacts;
 	
 	/*
-	 * TODO: Test files after all exceptions
 	 * TODO: Test the notes1 notes2 etc works.
-	 * TODO: Testbad files aren't read in.
-	 * TODO: Note dependency at start of test case - on these constructors and ID assumed starting at 1 and increasing by 1 - difficult to accurately check should, for exmaple increments not be by 1
+	 * TODO: Test a bad file returns with an exception.
 	 * TODO: test int return on future meeting. point out assumption needing to be made for adding contacts and past meeting as id not returned although could search after
 	 * TODO: Timezones.
 
@@ -333,6 +331,19 @@ public class TestContactManagerImpl {
 	{
 		cm2Contacts.addFutureMeeting(contacts3,futureDateYear);
 		assertTrue(cm2Contacts.getFutureMeetingList(futureDateYear).isEmpty());
+	}
+	
+	@Test 
+	public void testAddFutureMeetingIDReturnedFirst() {
+		int num = cm2Contacts.addFutureMeeting(contacts1,futureDateYear);
+		assertEquals(1,num);
+	}
+	
+	@Test 
+	public void testAddFutureMeetingIDReturnedSecond() {
+		cm2Contacts.addFutureMeeting(contacts1,futureDateYear);
+		int num = cm2Contacts.addFutureMeeting(contacts1,futureDateMonth);
+		assertEquals(2,num);
 	}
 	
 	@Test 
