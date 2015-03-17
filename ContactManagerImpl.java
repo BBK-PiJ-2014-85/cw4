@@ -253,6 +253,7 @@ public class ContactManagerImpl implements ContactManager {
 	
 	@Override
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date,String text) {
+		if (contacts == null || date == null || text == null) throw new NullPointerException("An argument was null");
 		if (contacts.isEmpty() || !this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contacts either empty or at least one doesn't exist");
 		meetings.add(new PastMeetingImpl(countMeeting, date, contacts, text));
 		flush();
