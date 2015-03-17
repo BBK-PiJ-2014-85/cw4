@@ -382,12 +382,12 @@ public class ContactManagerImpl implements ContactManager {
 		}
 		
 		String output = "<Contact>" 
-						+ "<NameTag>" + notInName + "<\\NameTag>" 
-						+ "<NotesTag>" + notInNotes + "<\\NotesTag>" 
-						+ "<ID>" + c.getId() + "<\\ID>"
-						+ "<" + notInName + ">" + c.getName() + "<\\" + notInName + ">"
-						+ "<" + notInNotes + ">" + c.getNotes() + "<\\" + notInNotes + ">"
-						+ "<\\Contact>";
+						+ "<NameTag>" + notInName + "</NameTag>" 
+						+ "<NotesTag>" + notInNotes + "</NotesTag>" 
+						+ "<ID>" + c.getId() + "</ID>"
+						+ "<" + notInName + ">" + c.getName() + "</" + notInName + ">"
+						+ "<" + notInNotes + ">" + c.getNotes() + "</" + notInNotes + ">"
+						+ "</Contact>";
 		return output;
 	}
 	
@@ -398,13 +398,13 @@ public class ContactManagerImpl implements ContactManager {
 	 */
 	private String meetingToFileString(Meeting m)
 	{
-		String stringId = "<ID>" + m.getId() + "<\\ID>";
+		String stringId = "<ID>" + m.getId() + "</ID>";
 
 		String stringCtId ="<Contacts>";
 		for (Contact c : m.getContacts()) stringCtId += c.getId() + ",";
-		stringCtId = stringCtId.substring(0, stringCtId.length() - 1) + "<\\Contacts>";
+		stringCtId = stringCtId.substring(0, stringCtId.length() - 1) + "</Contacts>";
 		
-		String stringDate = "<Date>" + m.getDate().getTimeInMillis() + "<\\Date>";
+		String stringDate = "<Date>" + m.getDate().getTimeInMillis() + "</Date>";
 		
 		String stringNotes = "", stringClassBegin, stringClassEnd;
 		
@@ -418,15 +418,15 @@ public class ContactManagerImpl implements ContactManager {
 				notesIterator++;
 			}
 			
-			stringNotes = "<" + notInNotes + ">" + ((PastMeeting)m).getNotes() + "<\\" + notInNotes + ">";
+			stringNotes = "<" + notInNotes + ">" + ((PastMeeting)m).getNotes() + "</" + notInNotes + ">";
 			
-			stringClassBegin = "<PastMeeting><NoteTag>" + notInNotes + "<\\NoteTag>"; //Set the tag at start and end to inform the class
-			stringClassEnd = "<\\PastMeeting>";
+			stringClassBegin = "<PastMeeting><NoteTag>" + notInNotes + "</NoteTag>"; //Set the tag at start and end to inform the class
+			stringClassEnd = "</PastMeeting>";
 		} catch (ClassCastException e)
 		{
 			stringNotes = "";
 			stringClassBegin = "<FutureMeeting>"; //set the tag at the start and end of line to inform class
-			stringClassEnd = "<\\FutureMeeting>";
+			stringClassEnd = "</FutureMeeting>";
 		}
 			
 		return stringClassBegin + stringId + stringCtId + stringDate + stringNotes + stringClassEnd;
@@ -502,7 +502,7 @@ public class ContactManagerImpl implements ContactManager {
 	private String getStringByTag(String line, String tag)
 	{
 		int firstLoc = line.indexOf("<" + tag + ">") + 2 + tag.length();
-		int lastLoc = line.indexOf("<\\" + tag + ">");
+		int lastLoc = line.indexOf("</" + tag + ">");
 		
 		return line.substring(firstLoc, lastLoc);
 	}
