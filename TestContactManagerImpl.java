@@ -1439,13 +1439,14 @@ public class TestContactManagerImpl {
 	
 	// Test exception thrown if input file invalid
 	
-	/* Assumed that an IOexception should be thrown if there is any issue happens when reading in the file.
+	/* Assumed that an IllegalStateException should be thrown if the input file isnt in a recognised format.
 	 * 
-	 *  The tests below check that a totally erroneous file returns an IO exception, and that
-	 *  also exceptions caused by erroneous Contact or Meeting records are converted to IOExceptions as well  
+	 *  The tests below check that if the file isn't in the correct format, an IllegalStateException is thrown, and that
+	 *  also exceptions caused by erroneous Contact or Meeting records (for example, number of null errors) 
+	 *  are converted to an IllegalStateException as well, as the problem is with the file format.  
 	 */
 	
-	@Test(expected=IOException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testInvalidInputFile()
 	{
 		contactFile.delete();
@@ -1468,7 +1469,7 @@ public class TestContactManagerImpl {
 		ContactManager cm = new ContactManagerImpl("Contact.txt"); //Check exception not thrown when reading in empty file
 	}
 	
-	@Test(expected=IOException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testInvalidInputFileErrorInContactNumber()
 	{
 		contactFile.delete();
@@ -1485,7 +1486,7 @@ public class TestContactManagerImpl {
 		ContactManager cm = new ContactManagerImpl();
 	}
 	
-	@Test(expected=IOException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testInvalidInputFileErrorInMeetingNumber()
 	{
 	contactFile.delete();
