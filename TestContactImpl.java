@@ -15,20 +15,6 @@ import org.junit.Test;
 
 public class TestContactImpl {
 
-	/*
-	 * getNotes
-	 * 	- TODO does adding notes to already existing notes append, overwrite, or be impossible?
-	 * 		- Current assumption is that it appends so you can add multiple notes about a contact
-	 *  - TODO should nulls be allowed in contact?
-
-	 * 
-	 * What to do with nulls?
-	 * 	- The interface does not state that the class will throw null pointer exceptions, whereas the class contact manager
-	 * 		will. I therefore will allow setting nulls for name and notes, as I will need to do this in contactmanager anyhow
-	 * 		as otherwise it wouldnt be able to deal with other implemetnations of contact which do not throw exceptions. 
-	 * 
-	 */
-	
 	
 	@Test
 	public void testID()
