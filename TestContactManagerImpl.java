@@ -18,11 +18,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * Tests the ContactManagerImpl implementation of interface ContactManager.
+ * 	-Assumption on ID and constructors
+ * 	-Clock used to fix time
+ * 	-Multiple calendar dates chosen to ensure time is accurate
  * 
  * @author Paul Day
  *
@@ -46,79 +48,25 @@ public class TestContactManagerImpl {
 	final Calendar pastDateMinute= new GregorianCalendar(2010,6,6,12,9,31);
 	final Calendar pastDateSecond= new GregorianCalendar(2010,6,6,12,10,29);
 	
-
-	
 	final File contactFile = new File("Contact.txt");
 	final File cm1File = new File("cm1.txt");
 	final File cm2File = new File("cm2.txt");
 	final File cm3File = new File("cm3.txt");
 	
-	/* 
-	 * testContactsFile.txt contains no meetings and two contacts:
-	 * 	1) id=1 name="Bob" notes="Nice guy"
-	 * 	2) id=2 name="Fred" notes="Talks too much"
-	 */
-	final File testContactsFile = new File("testContactsFile.txt");
-	
-	/*
-	 * testMeetingsFile.txt contains two contacts and two meetings:
-	 * Contacts:
-	 * 	1) id=1 name="Bob" notes="Nice guy"
-	 * 	2) id=2 name="Fred" notes="Talks too much"
-	 * 	3) id=3 name="Anon" notes=""
-	 * 
-	 * 4 Meetings:
-	 * 	1) 
-	 */
-	final File testMeetingsFile = new File("tests/testMeetingsFile.txt");
-	final File testConAndMeetFile = new File("tests/testConAndMeetFile.txt");
-	
-	//final Path contactPath = contactFile.toPath();
-	//final Path testContactsPath = testContactsFile.toPath();
-	//final Path testMeetingsPath = testMeetingsFile.toPath();
-	//final Path testConAndMeetPath = testConAndMeetFile.toPath();
-	
 	Contact c1, c2, c3;
 	
 	Set<Contact> contacts1, contacts2, contacts3;
 	
-	Meeting m1, m2, m3, m4;
-	
-	
 	ContactManager cm, cm3Contacts, cm2Contacts, cm1Contacts;
 	
 	/*
-
-	 * TODO: getContactsInt, what if no input?
-	 * TODO: Should meetings be autoupdated when they become past?
-	 * TODO: how do we do something on program close? Will need to test this in several places, for now, just have a flush
-	 * 			after every method that can run?
-	 * TODO: What does meeting not contain duplicates mean for getFutureMeetingList. Which one to keep if different contacts? 
-	 * TODO: Need to ask: If add past meeting in future, will this then show on future or past searches? Similar if searching for past or future
-		
-
-	 * TODO: ME: Test things dont get removed when getting
-	 * TODO: Test files after all excpetions
-	 * 
-	 * TODO: WHAT ABOUT NULLs?
-	 * TODO: Can just use equals not I've defined these
-	 * TODO: Remove the return illegal argument if in the future
-	 * TODO: find a way to store, and make sure rights ID's are read in.
-	 * TODO: CHANGE IT FROM UPDATING TO PAST MEETINGS, only one method does this, jsut cast it
-	 * TODO: what does duplicate mean and how can they happen? Multiuple matches by contact? Take this literally on compare and add tests for these
-	 * TODO: make sure empty and null are dealt with in every case
-	 * TODO: test dates equal properly as need to round in serialisation. what of milli gets rounded?
-	 * TODO: Test meeting chaing to past, with "" notes, when serialised
+	 * TODO: Test files after all exceptions
 	 * TODO: Test the notes1 notes2 etc works.
 	 * TODO: Testbad files aren't read in.
-	 * TODO: Test meetings changing works properly in file
-	 * TODO: Test things being changed and added in different orders
-	 * TODO: Check nothing printed after exceptions
-	 * TODO: Change direct id calling as this stoips it testing generic interfaces
-	 * 
-	 * TODO: Write excpetions for file reading, including id's not right
-	 * TODO: Fix sloppy list to id assumption
+	 * TODO: Note dependency at start of test case - on these constructors and ID assumed starting at 1 and increasing by 1 - difficult to accurately check should, for exmaple increments not be by 1
 	 * TODO: test int return on future meeting. point out assumption needing to be made for adding contacts and past meeting as id not returned although could search after
+	 * TODO: Timezones.
+
 
 	 */
 	
@@ -183,12 +131,6 @@ public class TestContactManagerImpl {
 		cm3Contacts.addNewContact("Bob","Nice guy");
 		cm3Contacts.addNewContact("Fred","Talks too much");
 		cm3Contacts.addNewContact("Anon","");
-		
-		
-		m1 = new MeetingImpl(1,null,null); //TODO: Add proper meetings in here
-	//	m2 = new PastMeetingImpl(); //TODO: Add proper meetings in here
-	//	m3 = new PastMeetingImpl(); //TODO: Add proper meeting, without notes yet, in here
-	//	m4 = new FutureMeetingImpl(); //TODO: Add proper meetings in here
 	}
 	
 	// Test reading and altering file correctly
@@ -356,6 +298,12 @@ public class TestContactManagerImpl {
 		cm3Contacts.addFutureMeeting(contacts2,pastDateSecond);
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddFutureMeetingPastExceptionNoMeetingAdded() {
+		cm3Contacts.addFutureMeeting(contacts2,pastDateMinute);
+		assertTrue(cm3Contacts.getFutureMeetingList(pastDateMinute).isEmpty());
+	}
+	
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddFutureMeetingUnknownContactNoContactsStoredException() {
 		cm.addFutureMeeting(contacts2,futureDateYear);
@@ -378,6 +326,13 @@ public class TestContactManagerImpl {
 	public void testAddFutureMeetingEmptyContactsListException() {
 		Set<Contact> empty = new HashSet<Contact>();
 		cm2Contacts.addFutureMeeting(empty,futureDateYear);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddFutureMeetingNoMeetingAddedOnContactsException()
+	{
+		cm2Contacts.addFutureMeeting(contacts3,futureDateYear);
+		assertTrue(cm2Contacts.getFutureMeetingList(futureDateYear).isEmpty());
 	}
 	
 	@Test 
@@ -691,8 +646,7 @@ public class TestContactManagerImpl {
 	
 	@Test 
 	public void testGetFutureListContactDoesntReturnPastMeetingInFuture() {
-		// Pastmeetings can be added with future dates via the addNewPastMeeting method. 
-		// I've assumed these should be able to be added as the return item is a Meeting not a FutureMeeting
+
 		cm3Contacts.addNewPastMeeting(contacts2, futureDateDay,"Notes");
 		List<Meeting> testList = new ArrayList<Meeting>();
 		testList.add(new PastMeetingImpl(1,futureDateDay,contacts2,"Notes"));
@@ -1020,13 +974,25 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test(expected=NullPointerException.class)
+	public void testAddPastMeetingContactsNullExceptionNoMeetingAdded() {
+		cm2Contacts.addNewPastMeeting(null, pastDateMonth, "null contacts");
+		assertTrue(cm2Contacts.getFutureMeetingList(pastDateMonth).isEmpty()); //getFutureMeetingList(Calendar) returns past meetings
+	}
+	
+	@Test(expected=NullPointerException.class)
 	public void testAddPastMeetingDateNullException() {
 		cm2Contacts.addNewPastMeeting(contacts1, null, "null date");
 	}
 	
 	@Test(expected=NullPointerException.class)
-	public void testAddPastMeetingTestNullException() {
+	public void testAddPastMeetingNotesNullException() {
 		cm2Contacts.addNewPastMeeting(contacts1, pastDateMonth, null);
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testAddPastMeetingNotesNullExceptionNoMeetingAdded() {
+		cm2Contacts.addNewPastMeeting(contacts1, pastDateMonth, null);
+		assertTrue(cm2Contacts.getFutureMeetingList(pastDateMonth).isEmpty()); //getFutureMeetingList(Calendar) returns past meetings
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
@@ -1179,10 +1145,18 @@ public class TestContactManagerImpl {
 	public void testAddNewContactNameNullException() {
 		cm2Contacts.addNewContact(null, "Little to say about him");
 	}
+
 	
 	@Test(expected=NullPointerException.class) 
 	public void testAddNewContactNotesNullException() {
 		cm2Contacts.addNewContact("Bob", null);
+	}
+	
+	@Test(expected=NullPointerException.class) 
+	public void testAddNewContactNotesNullExceptionContactNotAdded() {
+		cm2Contacts.addNewContact("Unique Name", null);
+		assertTrue(cm2Contacts.getContacts("Unique Name").isEmpty());
+		
 	}
 	
 	@Test 
@@ -1422,6 +1396,8 @@ public class TestContactManagerImpl {
 		assertEquals(0,ct.size());
 	}
 
+	
+	
 	
 
 }
