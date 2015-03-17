@@ -23,27 +23,32 @@ import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * Tests the ContactManagerImpl implementation of interface ContactManager.
- * 	-Assumption on ID and constructors
- * 	-Clock used to fix time
- * 	-Multiple calendar dates chosen to ensure time is accurate
+/*
+ * This tests the ContactManagerImpl implementation of the interface ContactManager.
+ * 	
+ * Although attempts were made to test ContactManager generally, where much more powerful this has been written specifically for the ContactManagerImpl implementation. For example, the
+ * constructors may be different for other implementations, and other implementations may not use the same Clock class used here. Also, IDs have been used here knowing the 
+ * method ContactManagerImpl uses to assign IDs. This was to make is easier to ensure the new IDs were increasing as expected and unique, as otherwise, for example, we could not guarantee uniqueness 
+ * only observe that instances were unique. These tests may therefore need to be reviewed slightly for use on other implementations. 
  * 
  * @author Paul Day
- *
  */
 
 public class TestContactManagerImpl {
 
+	/* The dates below are used throughout the tests. The "current time" is set as currentDate. 
+	 * 
+	 * Dates were taken one second, one minute, one hour etc in the future and past to ensure there wasn't
+	 * an error measuring by each time period (for example, if time periods failed to take the year into account, futureDateYear would
+	 * appear in the past of currentDate, when really it is nearly a year ahead)
+	 */
 	final Calendar currentDate = new GregorianCalendar(2010,6,6,12,10,30);
-	
 	final Calendar futureDateYear= new GregorianCalendar(2011,5,5,11,9,28);
 	final Calendar futureDateMonth= new GregorianCalendar(2010,7,5,11,9,28);
 	final Calendar futureDateDay= new GregorianCalendar(2010,6,7,11,9,28);
 	final Calendar futureDateHour= new GregorianCalendar(2010,6,6,13,9,28);
 	final Calendar futureDateMinute= new GregorianCalendar(2010,6,6,12,11,28);
 	final Calendar futureDateSecond= new GregorianCalendar(2010,6,6,12,11,31);
-	
 	final Calendar pastDateYear= new GregorianCalendar(2009,7,7,13,11,31);
 	final Calendar pastDateMonth= new GregorianCalendar(2010,5,7,13,11,31);
 	final Calendar pastDateDay= new GregorianCalendar(2010,6,5,13,11,31);
@@ -51,6 +56,9 @@ public class TestContactManagerImpl {
 	final Calendar pastDateMinute= new GregorianCalendar(2010,6,6,12,9,31);
 	final Calendar pastDateSecond= new GregorianCalendar(2010,6,6,12,10,29);
 	
+	/*
+	 * These are files for different test versions of ContactManagerImpl
+	 */
 	final File contactFile = new File("Contact.txt");
 	final File cm1File = new File("cm1.txt");
 	final File cm2File = new File("cm2.txt");
@@ -62,7 +70,9 @@ public class TestContactManagerImpl {
 	
 	ContactManager cm, cm3Contacts, cm2Contacts, cm1Contacts;
 
-	
+	/*
+	 * Copies files when required for tests
+	 */
 	public void copyFile(File from, File to)
 	{
 		Path pFrom = from.toPath();
@@ -74,6 +84,9 @@ public class TestContactManagerImpl {
 		}
 	}
 	
+	/*
+	 * Returns a single contact from a set when required in tests
+	 */
 	public Contact getOnlyContactFromSet(Set<Contact> set)
 	{
 		if (set.size() == 0) fail("Set didn't return any contacts");
@@ -83,48 +96,67 @@ public class TestContactManagerImpl {
 		return null;
 	}
 	
-	
+	/*
+	 * Sets up a clean test environment for each test:
+	 * 	- cX - a contact
+	 * 	- contactsX - a set containing X contacts
+	 * 	- cmXContacts - a ContactManagerimpl with X contacts with file data stored in cmX.txt
+	 * - cm - a fresh ContactManagerImpl
+	 */
 	@Before 
 	public void cleanStart()
 	{
+		//Set time to currentDate
 		Clock.setTime(currentDate);
 		
+		// Delete all data files if they exist
 		if (contactFile.exists()) contactFile.delete();
 		if (cm1File.exists()) cm1File.delete();
 		if (cm2File.exists()) cm2File.delete();
 		if (cm3File.exists()) cm3File.delete();
+		
+		// Create a fresh ContacManagerImpl
 		cm = new ContactManagerImpl();
 		
+		// Create 3 contacts for use in the tests
 		c1 = new ContactImpl(1,"Bob","Nice guy");
 		c2 = new ContactImpl(2,"Fred","Talks too much");
 		c3 = new ContactImpl(3, "Anon", "");
 		
+		// Create a 1 contact set
 		contacts1 = new HashSet<Contact>();
 		contacts1.add(c1);
 		
+		// Create a 2 contact set
 		contacts2 = new HashSet<Contact>();
 		contacts2.add(c1);
 		contacts2.add(c2);
 		
+		// Create a 3 contact set
 		contacts3 = new HashSet<Contact>();
 		contacts3.add(c1);
 		contacts3.add(c2);
 		contacts3.add(c3);
 		
+		// Create a ContactManager with 1 contact
 		cm1Contacts = new ContactManagerImpl("cm1.txt");
 		cm1Contacts.addNewContact("Bob","Nice guy");
 		
+		// Create a ContactManager with 2 contacts
 		cm2Contacts = new ContactManagerImpl("cm2.txt");
 		cm2Contacts.addNewContact("Bob","Nice guy");
 		cm2Contacts.addNewContact("Fred","Talks too much");
 
+		// Create a ContactManager with 3 contacts
 		cm3Contacts = new ContactManagerImpl("cm3.txt");
 		cm3Contacts.addNewContact("Bob","Nice guy");
 		cm3Contacts.addNewContact("Fred","Talks too much");
 		cm3Contacts.addNewContact("Anon","");
 	}
 	
-	// Test reading and altering file correctly
+	/*
+	 * TEST READING AND ALTERING FILES CORRECTLY
+	 */
 	
 	@Test 
 	public void testFileCreatedIfNotExist() 
@@ -140,14 +172,12 @@ public class TestContactManagerImpl {
 		cm3TestContacts.addNewContact("Fred","Talks too much");
 		cm3TestContacts.addNewContact("Anon","");
 		cm3TestContacts.flush();
-		cm3TestContacts = null;
 		
 		cm = new ContactManagerImpl();
 		
 		assertEquals(c1,getOnlyContactFromSet(cm.getContacts(1)));
 		assertEquals(c2,getOnlyContactFromSet(cm.getContacts(2)));
 		assertEquals(c3,getOnlyContactFromSet(cm.getContacts(3)));
-		
 	}
 	
 	@Test 
@@ -158,7 +188,6 @@ public class TestContactManagerImpl {
 		cm3TestContacts.addNewContact("Fred","Talks too much");
 		cm3TestContacts.addNewContact("Anon","");
 		cm3TestContacts.flush();
-		cm3TestContacts = null;
 		
 		cm = new ContactManagerImpl("Contact.txt");
 		
@@ -181,7 +210,6 @@ public class TestContactManagerImpl {
 		cm3TestContacts.addFutureMeeting(contacts2,futureDateYear);
 		cm3TestContacts.addNewPastMeeting(contacts2,pastDateYear,"Some notes.");
 		cm3TestContacts.flush();
-		cm3TestContacts = null;
 		
 		cm = new ContactManagerImpl();
 		
@@ -195,20 +223,9 @@ public class TestContactManagerImpl {
 		cm3Contacts.addFutureMeeting(contacts2,futureDateMonth);
 		cm3Contacts.addNewPastMeeting(contacts2,pastDateMonth,"Some notes.");
 		cm3Contacts.flush();
-		cm3Contacts = null;
 		
 		cm = new ContactManagerImpl("cm3.txt");
 
-		PastMeeting pm = new PastMeetingImpl(2,pastDateMonth,contacts2,"Some notes.");
-		
-		assertEquals(pm.getContacts(),cm.getMeeting(2).getContacts());
-		
-		cm.getMeeting(2).getDate().getTime();
-		
-		assertEquals(pm.getDate(),cm.getMeeting(2).getDate());
-		
-		
-		
 		assertEquals(new FutureMeetingImpl(1,futureDateMonth,contacts2),cm.getMeeting(1));
 		assertEquals(new PastMeetingImpl(2,pastDateMonth,contacts2,"Some notes."),cm.getMeeting(2));
 	}
@@ -217,7 +234,6 @@ public class TestContactManagerImpl {
 	public void testFileReadNextContactIDCorrect() 
 	{
 		cm3Contacts.flush();
-		cm3Contacts = null;
 		
 		Contact newContact = new ContactImpl(4,"Extra Added","Next contact");
 		Set<Contact> newSet = new HashSet<Contact>();
@@ -233,7 +249,6 @@ public class TestContactManagerImpl {
 	{
 		cm3Contacts.addFutureMeeting(contacts2,futureDateMonth);
 		cm3Contacts.flush();
-		cm3Contacts = null;
 
 		cm = new ContactManagerImpl("cm3.txt");
 		cm.addFutureMeeting(contacts2,futureDateDay);
@@ -246,7 +261,6 @@ public class TestContactManagerImpl {
 	{
 		cm3Contacts.addFutureMeeting(contacts2,futureDateMonth);
 		cm3Contacts.flush();
-		cm3Contacts = null;
 
 		cm = new ContactManagerImpl("cm3.txt");
 		cm.addNewPastMeeting(contacts2,pastDateDay,"Notes");
@@ -255,7 +269,9 @@ public class TestContactManagerImpl {
 	}
 
 	
-	// Test addFutureMeeting()
+	/*
+	 *  TEST addFutureMeeting()
+	 */
 
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddFutureMeetingContactsNull() {
@@ -310,7 +326,6 @@ public class TestContactManagerImpl {
 	
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddFutureMeetingUnknownContactContactsStoredException() {
-
 		Set<Contact> solo = new HashSet<Contact>();
 		solo.add(new ContactImpl(5,"Unknown guy","Dont take sweets from him."));
 		cm3Contacts.addFutureMeeting(solo,futureDateYear);
@@ -421,7 +436,9 @@ public class TestContactManagerImpl {
 		assertNotNull(tempCM.getFutureMeeting(2));
 	}
 	
-	// Test getPastMeeting()
+	/*
+	 *  TEST getPastMeeting()
+	 */
 	
 	@Test(expected=IllegalArgumentException.class) 
 	public void testGetPastMeetingFutureIdExistsExceptionFirst() {
@@ -491,17 +508,19 @@ public class TestContactManagerImpl {
 		cm2Contacts.getPastMeeting(1);
 	}
 	
-	// Test getFutureMeeting()
+	/*
+	 *  TEST getFutureMeeting()
+	 */
 	
 	@Test(expected=IllegalArgumentException.class)  
-	public void testGetFutureMeetingFutureIdExistsExceptionFirst() {
+	public void testGetFutureMeetingIdExistsButPastExceptionFirst() {
 		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "First Meeting in past");
 		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Second Meeting in past");
 		cm2Contacts.getFutureMeeting(1);
 	}
 	
 	@Test(expected=IllegalArgumentException.class)  
-	public void testGetFutureMeetingFutureIdExistsExceptionSecond() {
+	public void testGetFutureMeetingIdExistsExistsButPastExceptionSecond() {
 		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "First Meeting in past");
 		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth, "Second Meeting in past");
 		cm2Contacts.getFutureMeeting(2);
@@ -510,7 +529,6 @@ public class TestContactManagerImpl {
 	@Test(expected=IllegalArgumentException.class)  
 	public void testGetFutureMeetingMeetingWasFutureNowInPastException() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
-		
 		Clock.setTime(new GregorianCalendar(2050,01,01));
 		cm2Contacts.getFutureMeeting(1);
 	}
@@ -565,7 +583,9 @@ public class TestContactManagerImpl {
 		assertEquals(futureDateSecond,cm2Contacts.getFutureMeeting(1).getDate());
 	}
 	
-	// Test getMeeting()
+	/*
+	 *  TEST getMeeting()
+	 */
 	
 	@Test 
 	public void testGetMeetingNotExist() {
@@ -602,7 +622,9 @@ public class TestContactManagerImpl {
 		assertEquals(futureDateMonth, cm2Contacts.getMeeting(2).getDate());
 	}
 	
-	// Test getFutureMeetingList(Contact)
+	/*
+	 *  TEST getFutureMeetingList(Contact)
+	 */
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetFutureListContactNotExistException() {
@@ -733,7 +755,9 @@ public class TestContactManagerImpl {
 		assertEquals(contacts2, rtn.get(0).getContacts());
 	}
 	
-	// Test getFutureMeetingList(Calendar)
+	/*
+	 *  TEST getFutureMeetingList(Calendar)
+	 */
 
 	@Test 
 	public void testGetFutureListDateNoMeetingsMatch() {
@@ -821,7 +845,9 @@ public class TestContactManagerImpl {
 
 	}
 	
-	// Test getPastMeetingList(Contact)
+	/*
+	 *  TEST getPastMeetingList(Contact)
+	 */
 	
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetPastListContactNotExistException() {
@@ -978,7 +1004,9 @@ public class TestContactManagerImpl {
 		assertTrue(rtn.containsAll(list1) || rtn.containsAll(list2));	
 	}
 	
-	// Test addNewPastMeeting()
+	/*
+	 *  TEST addNewPastMeeting()
+	 */
 	
 	@Test(expected=NullPointerException.class)
 	public void testAddPastMeetingContactsNullException() {
@@ -1094,7 +1122,9 @@ public class TestContactManagerImpl {
 		assertEquals(new PastMeetingImpl(1,pastDateDay,contacts2,"First meeting"),cmTest.getMeeting(1));
 	}
 	
-	// Test addMeetingNotes()
+	/*
+	 *  TEST addMeetingNotes()
+	 */
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddMeetingNotesMeetingNotExistException() {
@@ -1147,6 +1177,14 @@ public class TestContactManagerImpl {
 	}
 	
 	@Test 
+	public void testAddMeetingNotesOverwritesNotesWithEmpty() {
+		//Assumption that this overwrites notes, as no exception is returned for not doing so
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth,"Original notes.");
+		cm2Contacts.addMeetingNotes(1, "");
+		assertEquals("",cm2Contacts.getPastMeeting(1).getNotes());
+	}
+	
+	@Test 
 	public void testAddMeetingNotesFileUpdated() {
 		cm2Contacts.addNewPastMeeting(contacts2, pastDateMonth,"Some notes.");
 		cm2Contacts.addMeetingNotes(1, "Changed notes.");
@@ -1155,7 +1193,9 @@ public class TestContactManagerImpl {
 		assertEquals("Changed notes.",cmTemp.getPastMeeting(1).getNotes());
 	}
 
-	// Test addNewContact()
+	/*
+	 *  TEST addNewContact()
+	 */
 	
 	@Test(expected=NullPointerException.class)
 	public void testAddNewContactNameNullException() {
@@ -1236,7 +1276,9 @@ public class TestContactManagerImpl {
 		assertEquals(set,cmTemp.getContacts(2));
 	}
 	
-	// Test getContacts(int)
+	/*
+	 *  TEST getContacts(int)
+	 */
 	
 	@Test 
 	public void testGetContactsIntOneParameterFirst() {
@@ -1264,7 +1306,6 @@ public class TestContactManagerImpl {
 		assertTrue(ct.contains(c2));
 	}
 
-	
 	@Test 
 	public void testGetContactsIntMultipleParametersFirstInListIncluded() {
 		Set<Contact> ct = cm3Contacts.getContacts(1,2,3);
@@ -1300,7 +1341,9 @@ public class TestContactManagerImpl {
 		cm2Contacts.getContacts();
 	}
 	
-	// Test getContacts(String)
+	/*
+	 *  TEST getContacts(String)
+	 */
 
 	@Test(expected=NullPointerException.class) 
 	public void testGetContactsStringNullParamterException() {
@@ -1412,7 +1455,9 @@ public class TestContactManagerImpl {
 		assertEquals(0,ct.size());
 	}
 	
-	// Test TimeZones correctly measured 
+	/*
+	 *  TEST TIMEZONES CORRECTLY MEASURED
+	 */
 	
 	@Test
 	public void testTimeZoneCorrectlyMeasured()
@@ -1445,7 +1490,7 @@ public class TestContactManagerImpl {
 	
 	// Test exception thrown if input file invalid
 	
-	/* Assumed that an IllegalStateException should be thrown if the input file isnt in a recognised format.
+	/* Assumed that an IllegalStateException should be thrown if the input file isn't in a recognised format.
 	 * 
 	 *  The tests below check that if the file isn't in the correct format, an IllegalStateException is thrown, and that
 	 *  also exceptions caused by erroneous Contact or Meeting records (for example, number of null errors) 
@@ -1508,10 +1553,4 @@ public class TestContactManagerImpl {
 		
 		ContactManager cm = new ContactManagerImpl();
 	}
-
-	
-
-	
-	
-
 }
