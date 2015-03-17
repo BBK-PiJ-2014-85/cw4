@@ -68,22 +68,36 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * Default constructor writing using the default "Contact.txt" file.
 	 * 
+	 * @throws IllegalStateException if the data file is not in the correct format
 	 */
 	public ContactManagerImpl()
 	{
 		CONTACTS_FILE = new File("Contact.txt");
-		launch();
+		try{	
+			launch();
+		} catch (RuntimeException e)
+		{
+			throw new IllegalStateException("Input file not in correct format for this ContactManager.");
+		}
+
 	}
 	
 	/**
 	 * Constructor where the user sets the location of the save file.
 	 * 
 	 * @param fileLocation the location of the file to be used.
+	 * @throws IllegalStateException if the data file is not in the correct format
 	 */
-	public ContactManagerImpl(String fileLocation)
+	public ContactManagerImpl(String fileLocation) 
 	{
 		CONTACTS_FILE= new File (fileLocation); 
-		launch();
+		try{	
+			launch();
+		} catch (RuntimeException e)
+		{
+			throw new IllegalStateException("Input file not in correct format for this ContactManager.");
+		}
+		
 	}
 	
 	
@@ -239,7 +253,6 @@ public class ContactManagerImpl implements ContactManager {
 	
 	@Override
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date,String text) {
-		if (contacts == null || date == null || text == null) throw new NullPointerException("A parameter is null");
 		if (contacts.isEmpty() || !this.contacts.containsAll(contacts)) throw new IllegalArgumentException("Contacts either empty or at least one doesn't exist");
 		meetings.add(new PastMeetingImpl(countMeeting, date, contacts, text));
 		flush();
@@ -428,8 +441,6 @@ public class ContactManagerImpl implements ContactManager {
 					{
 					readLine(line);
 					}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
