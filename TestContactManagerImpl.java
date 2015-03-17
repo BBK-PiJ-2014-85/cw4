@@ -6,7 +6,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -16,6 +18,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -60,11 +63,7 @@ public class TestContactManagerImpl {
 	ContactManager cm, cm3Contacts, cm2Contacts, cm1Contacts;
 	
 	/*
-	 * TODO: Test the notes1 notes2 etc works.
 	 * TODO: Test a bad file returns with an exception.
-	 * TODO: test int return on future meeting. point out assumption needing to be made for adding contacts and past meeting as id not returned although could search after
-	 * TODO: Timezones.
-
 
 	 */
 	
@@ -1406,8 +1405,105 @@ public class TestContactManagerImpl {
 		
 		assertEquals(0,ct.size());
 	}
+	
+	// Test TimeZones correctly measured 
+	
+	@Test
+	public void testTimeZoneCorrectlyMeasured()
+	{
+		// Set a time that, although before it in local time, is actually ahead due to time zone
+		Calendar current = new GregorianCalendar(2015,03,03,03,03,03);
+		current.setTimeZone(TimeZone.getTimeZone("GMT"));
+		Calendar future = new GregorianCalendar(2015,03,03,03,02,03);
+		future.setTimeZone(TimeZone.getTimeZone("PST"));
+		Clock.setTime(current);
+		
+		cm2Contacts.addFutureMeeting(contacts1, future); //Throws exception if meeting is in the past
+	}
+	
+	@Test
+	public void testTimeZoneCorrectlyMeasuredOnLoad()
+	{
+		// Set a time that, although before it in local time, is actually ahead due to time zone
+		Calendar current = new GregorianCalendar(2015,03,03,03,03,03);
+		current.setTimeZone(TimeZone.getTimeZone("GMT"));
+		Calendar future = new GregorianCalendar(2015,03,03,03,02,03);
+		future.setTimeZone(TimeZone.getTimeZone("PST"));
+		Clock.setTime(current);
+		
+		cm2Contacts.addFutureMeeting(contacts1, future);
+		
+		ContactManager cmTemp = new ContactManagerImpl("cm2.txt");
+		cmTemp.getFutureMeeting(1); //Exception will be thrown if it is not in the future
+	}
+	
+	// Test exception thrown if input file invalid
+	
+	/* Assumed that an IOexception should be thrown if there is any issue happens when reading in the file.
+	 * 
+	 *  The tests below check that a totally erroneous file returns an IO exception, and that
+	 *  also exceptions caused by erroneous Contact or Meeting records are converted to IOExceptions as well  
+	 */
+	
+	@Test(expected=IOException.class)
+	public void testInvalidInputFile()
+	{
+		contactFile.delete();
+		
+		try (PrintWriter out = new PrintWriter(contactFile)){
+			contactFile.createNewFile();
+			out.write("Gibberish! blah blah blah");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		
+		ContactManager cm = new ContactManagerImpl();
+	}
+	
+	@Test
+	public void testEmptyFileSavedAndReadIn()
+	{
+		ContactManager cm = new ContactManagerImpl("Contact.txt"); //Check exception not thrown when reading in empty file
+	}
+	
+	@Test(expected=IOException.class)
+	public void testInvalidInputFileErrorInContactNumber()
+	{
+		contactFile.delete();
+		
+		try (PrintWriter out = new PrintWriter(contactFile)){
+			contactFile.createNewFile();
+			out.write("<Contact><NameTag>Name<\\NameTag><NotesTag>Notes<\\NotesTag><ID>p<\\ID><Name>Bob<\\Name><Notes>happy man<\\Notes><\\Contact>");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		
+		ContactManager cm = new ContactManagerImpl();
+	}
+	
+	@Test(expected=IOException.class)
+	public void testInvalidInputFileErrorInMeetingNumber()
+	{
+	contactFile.delete();
+		
+		try (PrintWriter out = new PrintWriter(contactFile)){
+			contactFile.createNewFile();
+			out.write("<FutureMeeting><ID>1<\\ID><Contacts>1,2,3,4,5<\\Contacts><Date>15000000<\\Date><\\FutureMeeting>");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		
+		ContactManager cm = new ContactManagerImpl();
+	}
 
 	
+
 	
 	
 
