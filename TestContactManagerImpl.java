@@ -61,13 +61,7 @@ public class TestContactManagerImpl {
 	Set<Contact> contacts1, contacts2, contacts3;
 	
 	ContactManager cm, cm3Contacts, cm2Contacts, cm1Contacts;
-	
-	/*
-	 * TODO: Test a bad file returns with an exception.
 
-	 */
-	
-	//Test reading and writing file
 	
 	public void copyFile(File from, File to)
 	{
@@ -131,8 +125,6 @@ public class TestContactManagerImpl {
 	}
 	
 	// Test reading and altering file correctly
-	
-
 	
 	@Test 
 	public void testFileCreatedIfNotExist() 
@@ -265,6 +257,16 @@ public class TestContactManagerImpl {
 	
 	// Test addFutureMeeting()
 
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddFutureMeetingContactsNull() {
+		cm3Contacts.addFutureMeeting(null,pastDateYear);
+	}
+	
+	@Test(expected=IllegalArgumentException.class) 
+	public void testAddFutureMeetingDateNull() {
+		cm3Contacts.addFutureMeeting(contacts2,null);
+	}
+	
 	@Test(expected=IllegalArgumentException.class) 
 	public void testAddFutureMeetingPastDateExceptionYear() {
 		cm3Contacts.addFutureMeeting(contacts2,pastDateYear);
@@ -1001,8 +1003,12 @@ public class TestContactManagerImpl {
 	
 	@Test(expected=NullPointerException.class)
 	public void testAddPastMeetingNotesNullExceptionNoMeetingAdded() {
+		
+		
 		cm2Contacts.addNewPastMeeting(contacts1, pastDateMonth, null);
-		assertTrue(cm2Contacts.getFutureMeetingList(pastDateMonth).isEmpty()); //getFutureMeetingList(Calendar) returns past meetings
+		List<Meeting> list = cm2Contacts.getFutureMeetingList(pastDateMonth);
+		
+		assertTrue(list.isEmpty()); //getFutureMeetingList(Calendar) returns past meetings
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
