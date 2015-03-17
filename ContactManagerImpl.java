@@ -497,7 +497,7 @@ public class ContactManagerImpl implements ContactManager {
 	}
 	
 	/*
-	 * Given a line of input ("line"), it will find the String contained within "tag" such that <tag>String<\tag> 
+	 * Given a line of input ("line"), it will find the String contained within "tag" such that <tag>String</tag> 
 	 */
 	private String getStringByTag(String line, String tag)
 	{
