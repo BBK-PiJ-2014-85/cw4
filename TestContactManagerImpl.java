@@ -1527,7 +1527,7 @@ public class TestContactManagerImpl {
 		
 		try (PrintWriter out = new PrintWriter(contactFile)){
 			contactFile.createNewFile();
-			out.write("<Contact><NameTag>Name<\\NameTag><NotesTag>Notes<\\NotesTag><ID>p<\\ID><Name>Bob<\\Name><Notes>happy man<\\Notes><\\Contact>");
+			out.write("<Contact><NameTag>Name</NameTag><NotesTag>Notes</NotesTag><ID>p</ID><Name>Bob</Name><Notes>happy man</Notes></Contact>");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -1544,7 +1544,7 @@ public class TestContactManagerImpl {
 		
 		try (PrintWriter out = new PrintWriter(contactFile)){
 			contactFile.createNewFile();
-			out.write("<FutureMeeting><ID>1<\\ID><Contacts>1,2,3,4,5<\\Contacts><Date>15000000<\\Date><\\FutureMeeting>");
+			out.write("<FutureMeeting><ID>1</ID><Contacts>1,2,3,4,5</Contacts><Date>15000000</Date></FutureMeeting>");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
