@@ -37,9 +37,10 @@ import java.util.stream.Collectors;
  * 	- assigning to notes to something already with notes will overwrite these
  * 	- Direct access chosen: No delete methods available, IDs managed in ContactManager and are exclusive to only ContactManager. By starting with IDs at 1 and incrementing each by 1, 
  * 		each object can be stored in the same position in the list as it's ID, making fast direct access possible.
- * 	- Timezones assumption?
  * 	- Any changes (i.e. meetings and contacts being added) are saved to the file immediately when they are made
  * 	- User created Calendars may lose specific functionality when restored as a GregorianCalendar is returned. The time etc will be as before.These would need to be converted.
+ * 	- Null inputs: addFutureMeeting(Contacts,Date) does not specify a NullPointerException if any of the input parameters are null. Null parameters therefore return
+ * 					an IllegalArgumentException as this is within the specification, although a NullPointerException would be more appropriate.
  * 
  * @author Paul Day
  */
@@ -100,10 +101,16 @@ public class ContactManagerImpl implements ContactManager {
 		
 	}
 	
+	/**{@inheritDoc}
+	 * 
+	 * Returns an IllegalArgumentException if any of the inputs are null. 
+	 * 
+	 */
 	
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		
+		if (contacts == null || date == null) throw new IllegalArgumentException("Input is null");
 		if (Clock.getCurrent().compareTo(date) >=0 ) throw new IllegalArgumentException("Date is in the past");
 		if (!this.contacts.containsAll(contacts) || contacts.isEmpty()) throw new IllegalArgumentException("Contact not found");
 		
@@ -113,7 +120,7 @@ public class ContactManagerImpl implements ContactManager {
 		return countMeeting - 1;
 	}
 
-	/**{@inheritDoc}}
+	/**{@inheritDoc}
 	 * 
 	 * Should a FutureMeeting exist which is now in the past, the meeting will be converted to as PastMeeting with no notes
 	 * when this method is run.
