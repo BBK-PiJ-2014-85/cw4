@@ -15,36 +15,37 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * This is an implementation of the ContactManager interface. Several assumptions have been made for this implementation
- * where the specification of ContactManager was not specific:
- * 	- Duplicates: Methods returning lists of meetings have the specification to remove duplicates. It is impossible for 
- * 		meetings to have the same ID, and therefore for these purposes meetings have been defined as duplicate if their time 
- * 		and full list of contacts match. Notes have not been matched for PastMeeting's as even if these differ, they are the same meeting in practice.
- * 	- Unique IDs managed by ContactManager: It was assumed with specification that ContactManager could determine the Meeting and Contact ID's. The main reasons for this were:
- * 		-ContactManager saves contacts to file and then reloads these later, which the Contact interface does not have methods to update and manage (for example, no flush() method). 
- * 			Therefore, creating a contact outside of ContactManager with a unique ID in a fresh session and then opening a ContactManager with existing IDs would likely create a duplicate ID.
- * 		-The above issue could be avoided by returning an exception and having to change the user ID if it existed to maintain uniqueness, but it is undesirable for user Ids
- * 			to change between runs.
- * 		-You can only add a contact to a ContactManager by use of a name and notes, which as neither of these are necessarily unique and therefore you couldn't create a contact
- * 			outside of ContactManager and then add it, as every time a new Contact would be added within the manager. It would make sense then to use ContactManager to manage contacts.
- * 		-Given the above a contact cannot exist on two contact managers.
- * 		-Similar arguments to that outlined above also applies to Meeting
- * 	- PastMeeting's can be in future: there is not an exception thrown when adding a pastMeeting in the future, and these will be returned in the getFutureMeeting lists but will not
- * 		in getFutureMeeting(id) as it would need to be cast as a FutureMeeting
- * 	- FutureMeeting's changed to PastMeeting: within the getPastMeeting type methods where it is seen that a FutureMeeting is now in the Past, it will be converted to a PastMeeting
- * 		within the ContactManager.
- * 	- Interpretation of past and future is by date not type: Generally speaking, where a search for a past of future meeting is made it is searched by date, not by class type. 
- * 	- assigning to notes to something already with notes will overwrite these
- * 	- Direct access chosen: No delete methods available, IDs managed in ContactManager and are exclusive to only ContactManager. By starting with IDs at 1 and incrementing each by 1, 
- * 		each object can be stored in the same position in the list as it's ID, making fast direct access possible.
- * 	- Any changes (i.e. meetings and contacts being added) are saved to the file immediately when they are made
- * 	- User created Calendars may lose specific functionality when restored as a GregorianCalendar is returned. The time etc will be as before.These would need to be converted.
- * 	- Null inputs: addFutureMeeting(Contacts,Date) does not specify a NullPointerException if any of the input parameters are null. Null parameters therefore return
- * 					an IllegalArgumentException as this is within the specification, although a NullPointerException would be more appropriate.
+ * This is an implementation of the ContactManager interface. Several assumptions have been made for this implementation of ContactManager:
+ * <ul>
+ * 	<li>Duplicates: Where methods specify removing duplicates from a list, meetings are determined as duplicate if their time and attendees match (i.e. IDs and notes can  be different).</li>
+ * 	<li>Unique IDs are managed by ContactManager: It was assumed that ContactManager should determine the Meeting and Contact ID's (reasons provided within code).</li>
+ * 	<li>PastMeeting's can be in future: addPastMeeting() does not return an exception when adding a meeting with a future date. PastMeeting's with future dates  
+ * 		will be returned in the getFutureMeeting lists but will not be provided by getFutureMeeting(id) as it would need to be cast as a FutureMeeting </li>
+ * 	<li>FutureMeeting's changed to PastMeeting: within the getPastMeeting type methods where it is seen that a FutureMeeting is now in the Past due to time passing, 
+ * 		it will be converted to a PastMeeting within the ContactManager.</li>
+ * 	<li>Interpretation of past and future is by date not type: Generally speaking, where a search for a past of future meeting is made it is searched by date, not by class type. 
+ * 	<li>Assigning to notes to something already with notes will overwrite the previous notes.</li>
+ * 	<li>Any changes (i.e. meetings and contacts being added) are saved to the file immediately when they are made</li>
+ * 	<li>Bespoke Calendar implementations (not Gregorian Calendar) such as those created by the user will lose any functionality not provided by Calendar when reloaded by ContactManager.</li>
+ * 	<li>Null inputs: addFutureMeeting(Contacts,Date) does not specify a NullPointerException if any of the input parameters are null. Null parameters therefore return an IllegalArgumentException as this is within the specification, although a NullPointerException would be more appropriate.</li>
+ * </ul>
  * 
  * @author Paul Day
  */
 
+/*
+ * Notes above that provided above to help understand and/or maintain the code:
+ *  	-	It was assumed that ContactManager should ensure the IDs are unique. The main reason for this was that Contact did not have methods to update and manage the file (for example, via a flush()), 
+ *  		while to ensure that IDs remain unique it would need access to this file and write every contact it creates to this file. Otherwise, when reading in a contact manager's file, should
+ *  		Contact have already created a contact it would be likely to contain duplicate IDs would be unique. It is also impossible to add a Contact to the ContactManager with a specific ID,
+ *  		which means that any Contact/Meeting created outside the ContactManager is unable to be imported. A similar thought argument applies to Meeting's as well. This, combined with the
+ *  		spec not making it clear that Contact/Meeting was meant to manage the IDs it was therefore assumed that the ContactManager was intended to manage the IDs, as to use a Contact/Meeting 
+ *  		elsewhere and within ContactManager it would need to be added via ContactManager first. 
+ *		
+ *		-	Given the assumption above, IDs are chosen to start at 1 and increment by 1 for each new Meeting/Contact (separate counts for each). This means that, given a known ID, direct access is
+ *			possible as each entry is stored in the list at position ID - 1. This is possible as there is no way to delete contacts/meetings. This approach was chosen as it is faster, however this
+ *			does have the downside that a lot of the code would need to change should extra features such as removing Contacts/Meetings want to be implmented at a alter date.
+ */
  
 
 public class ContactManagerImpl implements ContactManager {
@@ -67,7 +68,7 @@ public class ContactManagerImpl implements ContactManager {
 	List<Meeting> meetings = new ArrayList<Meeting>();
 	
 	/**
-	 * Default constructor writing using the default "Contact.txt" file.
+	 * Default constructor using the default "Contact.txt" file.
 	 * 
 	 * @throws IllegalStateException if the data file is not in the correct format
 	 */
@@ -146,7 +147,7 @@ public class ContactManagerImpl implements ContactManager {
 		return rtn;
 	}
 
-	/**{@inheritDoc}}
+	/**{@inheritDoc}
 	 * 
 	 * Should a meeting be in the future but be of the class PastMeeting, an IllegalArugmentException will be thrown.
 	 * 
@@ -184,7 +185,7 @@ public class ContactManagerImpl implements ContactManager {
 		return rtn;
 	}
 
-	/**{@inheritDoc}}
+	/**{@inheritDoc}
 	 * 
 	 * Duplicate meetings, determined by have the same contacts and time, are removed.
 	 * 
@@ -210,7 +211,7 @@ public class ContactManagerImpl implements ContactManager {
 		return rtn;
 	}
 	
-	/**{@inheritDoc}}
+	/**{@inheritDoc}
 	 * 
 	 * Duplicate meetings, determined by have the same contacts and time, are removed.
 	 * 
@@ -252,7 +253,7 @@ public class ContactManagerImpl implements ContactManager {
 		return rtn;
 	}
 
-	/**{@inheritDoc}}
+	/**{@inheritDoc}
 	 * 
 	 * PastMeeting's can be added in the future.
 	 * 
@@ -267,7 +268,7 @@ public class ContactManagerImpl implements ContactManager {
 		countMeeting++;
 	}
 
-	/**{@inheritDoc}}
+	/**{@inheritDoc}
 	 * 
 	 * Running this method on a meeting with notes already will overwrite the current notes of the PastMeeting.
 	 * 
