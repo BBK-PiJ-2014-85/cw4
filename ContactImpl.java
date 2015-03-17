@@ -5,7 +5,7 @@
  * 
  * This class does not ensure that ID's are unique, and therefore has a dependency on another class to ensure that IDs provided to this are unique.
  * 
- * ContactManagerImpl ensures IDs provided to this are unique,
+ * ContactManagerImpl ensures IDs provided to this are unique.
  * 	
  * Several assumptions have been made in the creation of this class:
  * <ul>
