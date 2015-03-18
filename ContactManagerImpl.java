@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
  * 	<li>Any changes (i.e. meetings and contacts being added) are saved to the file immediately when they are made</li>
  * 	<li>Bespoke Calendar implementations (not Gregorian Calendar) such as those created by the user will lose any functionality not provided by Calendar when reloaded by ContactManager.</li>
  * 	<li>Null inputs: addFutureMeeting(Contacts,Date) does not specify a NullPointerException if any of the input parameters are null. Null parameters therefore return an IllegalArgumentException as this is within the specification, although a NullPointerException would be more appropriate.</li>
+ * 	<li>Empty Names: Adding a contact with an empty name "" is not allowed, and treated as a null. This is consistent with not being able to search for "" in contacts.</li>
+ * 	<li>ID's Positive: The ID's this ContactManager uses are all positive. There is therefore a maximum 2^31 - 1 possible contacts and meetings.</li>
  * </ul>
  * 
  * @author Paul Day
@@ -283,6 +285,12 @@ public class ContactManagerImpl implements ContactManager {
 		flush();
 	}
 
+	/**{@inheritDoc}
+	 * 
+	 * Adding a contact with the name as the empty string "" is also not allowed and results in a NullPointerException. This
+	 * is consistent with not being able to search for names with an empty string.
+	 * 
+	 */
 	@Override
 	public void addNewContact(String name, String notes) {
 		
