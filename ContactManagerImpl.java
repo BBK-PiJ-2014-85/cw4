@@ -341,10 +341,7 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public void flush() {
 
-		CONTACTS_FILE.delete();
-		
 		try (PrintWriter out = new PrintWriter(CONTACTS_FILE)){
-			CONTACTS_FILE.createNewFile();
 			out.write(createFile());
 			
 		} catch (FileNotFoundException e) {
