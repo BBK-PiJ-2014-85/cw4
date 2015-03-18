@@ -508,6 +508,20 @@ public class TestContactManagerImpl {
 		cm2Contacts.getPastMeeting(1);
 	}
 	
+	@Test 
+	public void testGetPastMeetingNegativeID() {
+		cm2Contacts.addNewPastMeeting(contacts2,pastDateMonth,"First meeting in list");
+		
+		assertNull(cm2Contacts.getPastMeeting(-1));
+	}
+	
+	@Test 
+	public void testGetPastMeetingZeroID() {
+		cm2Contacts.addNewPastMeeting(contacts2,pastDateMonth,"First meeting in list");
+
+		assertNull(cm2Contacts.getPastMeeting(0));
+	}
+	
 	/*
 	 *  TEST getFutureMeeting()
 	 */
@@ -583,6 +597,18 @@ public class TestContactManagerImpl {
 		assertEquals(futureDateSecond,cm2Contacts.getFutureMeeting(1).getDate());
 	}
 	
+	@Test
+	public void testGetFutureMeetingIDZero() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		assertNull(cm2Contacts.getFutureMeeting(0));
+	}
+	
+	@Test
+	public void testGetFutureMeetingIDNegative() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		assertNull(cm2Contacts.getFutureMeeting(-1));
+	}
+	
 	/*
 	 *  TEST getMeeting()
 	 */
@@ -620,6 +646,18 @@ public class TestContactManagerImpl {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
 		assertEquals(contacts2, cm2Contacts.getMeeting(2).getContacts());
 		assertEquals(futureDateMonth, cm2Contacts.getMeeting(2).getDate());
+	}
+	
+	@Test 
+	public void testGetMeetingIDZero() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		assertNull(cm2Contacts.getMeeting(0));
+	}
+
+	@Test 
+	public void testGetMeetingIDNegative() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateDay);
+		assertNull(cm2Contacts.getMeeting(-1));
 	}
 	
 	/*
@@ -852,6 +890,11 @@ public class TestContactManagerImpl {
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetPastListContactNotExistException() {
 		cm2Contacts.getPastMeetingList(c3);
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetPastListContactNullContactException() {
+		cm2Contacts.getPastMeetingList(null);
 	}
 	
 	@Test 
@@ -1122,6 +1165,14 @@ public class TestContactManagerImpl {
 		assertEquals(new PastMeetingImpl(1,pastDateDay,contacts2,"First meeting"),cmTest.getMeeting(1));
 	}
 	
+	@Test 
+	public void testNewPastMeetingEmptyNotes() {
+		cm2Contacts.addNewPastMeeting(contacts2, pastDateDay, "");
+		assertEquals(pastDateDay, cm2Contacts.getMeeting(1).getDate());
+		assertEquals(contacts2,cm2Contacts.getMeeting(1).getContacts());
+		assertEquals("",((PastMeeting)cm2Contacts.getMeeting(1)).getNotes());
+	}
+	
 	/*
 	 *  TEST addMeetingNotes()
 	 */
@@ -1130,6 +1181,18 @@ public class TestContactManagerImpl {
 	public void testAddMeetingNotesMeetingNotExistException() {
 		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
 		cm2Contacts.addMeetingNotes(2,"Meeting didnt exist");
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddMeetingNotesMeetingNotExistZeroID() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addMeetingNotes(0,"Meeting ID not possible");
+	}
+	
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddMeetingNotesMeetingNotExistNegativeID() {
+		cm2Contacts.addFutureMeeting(contacts2, futureDateMonth);
+		cm2Contacts.addMeetingNotes(-1,"Meeting ID not possible");
 	}
 	
 	@Test(expected=IllegalStateException.class)
@@ -1200,6 +1263,11 @@ public class TestContactManagerImpl {
 	@Test(expected=NullPointerException.class)
 	public void testAddNewContactNameNullException() {
 		cm2Contacts.addNewContact(null, "Little to say about him");
+	}
+	
+	@Test(expected=NullPointerException.class)
+	public void testAddNewContactNameNullActuallyEmptyException() {
+		cm2Contacts.addNewContact("", "Didnt catch his name");
 	}
 
 	
