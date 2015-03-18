@@ -130,7 +130,7 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public PastMeeting getPastMeeting(int id) {
 		
-		if (id < 0 || id > meetings.size()) return null;
+		if (id <= 0 || id > meetings.size()) return null;
 		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) <= 0) throw new IllegalArgumentException("Meeting is in the past");
 
 		PastMeeting rtn;
@@ -154,7 +154,7 @@ public class ContactManagerImpl implements ContactManager {
 	 */
 	@Override
 	public FutureMeeting getFutureMeeting(int id) {
-		if (id < 0 || id > meetings.size()) return null;
+		if (id <= 0 || id > meetings.size()) return null;
 		
 		if (Clock.getCurrent().compareTo(meetings.get(id - 1).getDate()) >= 0) throw new IllegalArgumentException("Meeting is in the past");
 		
@@ -286,7 +286,7 @@ public class ContactManagerImpl implements ContactManager {
 	@Override
 	public void addNewContact(String name, String notes) {
 		
-		if (name==null || notes==null) throw new NullPointerException("Name or notes are null");
+		if (name==null || notes==null || name=="") throw new NullPointerException("Name or notes are null");
 		else {
 			contacts.add(new ContactImpl(countContact,name,notes));
 			countContact++;
